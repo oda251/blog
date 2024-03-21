@@ -1,10 +1,21 @@
 ---
+import Dropdown from './Dropdown.jsx';
 ---
 
-<header>
-	<a href="/">ホーム</a>
-	<a href="/about">概要</a>
-	<a href="/blog">ブログ</a>
+<script src="https://kit.fontawesome.com/ffad7d90c7.js" crossorigin="anonymous"></script>
+
+<header class="flex justify-end">
+	<div class="mr-3">
+		<a href="/">
+			<i class="fa-solid fa-home"> HOME </i>
+		</a>
+		<a href="/blog">
+			<i class="fa-solid fa-blog"> BLOG </i>
+		</a>
+		<a href="/about">
+			<i class="fa-solid fa-circle-question"> ABOUT </i>
+		</a>
+	</div>
 </header>
 
 <style>

@@ -1,0 +1,37 @@
+---
+	import Twitter from './links/Twitter.astro';
+	import GitHub from './links/GitHub.astro';
+	const articles: {[lang: string]: any} = {
+		"ja": {
+			"経歴": "早稲田大学 \n 42tokyo"
+		},
+		"en": {
+			"Past": "waseda univ \n 42tokyo"
+		}
+	}
+	const locale = Astro.currentLocale;
+---
+
+<div class="border border-gray p-3 rounded-md">
+	<h4 class="text-3xl border-b border-gray">Profile</h4>
+	{
+		Object.entries(articles["ja"]).map(([key, val]) => {
+			return (
+				<div>
+					<h5 class="text-xl">{key}</h5>
+					<p>{val}</p>
+				</div>
+			)
+		})
+	}
+	<div class="flex gap-4 text-xl">
+		<Twitter />
+		<GitHub />
+	</div>
+</div>
+
+<style>
+	.border-gray {
+		border-color: rgba(180, 178, 183, 0.629);
+	}
+</style>

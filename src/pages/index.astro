@@ -1,10 +1,46 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro'
-import Clock from '../components/Clock.astro'
+import Clock from '../components/Clock'
 const title = "Home"
+let message = "hello"
+let icon = "fa-running"
+let style = "--start-color: red; --end-color: orange;"
+const time = new Date().getHours()
+if (5 < time && time < 12) {
+	message = "good morning"
+	icon = "fa-person-falling"
+	style = "--start-color: lightseagreen; --end-color: lemonchiffon;"
+
+} else if (time < 18) {
+	message = "hello"
+	icon = "fa-running"
+	style = "--start-color: lemonchiffon; --end-color: orange;"
+} else if (time < 22) {
+	message = "Good evening"
+	icon = "fa-person-drowning"
+	style = "--start-color: orange; --end-color: indigo;"
+} else {
+	message = "Good night"
+	icon = "fa-bed"
+	style = "--start-color: indigo; --end-color: lightseagreen;"
+}
 ---
 
 <BaseLayout title={ title }>
-	<Clock />
-	<h1>hello</h1>
+	<div class="w-full flex justify-center">
+		<div>
+			<Clock additionalClass="font-medium text-gray-300" client:load />
+			<h1 class=`fa-solid ${ icon } gradient text-5xl font-bold animate-focus-in-expand-fwd` style={ style }> { message } </h1>
+		</div>
+	</div>
 </BaseLayout>
+
+<style>
+	.gradient {
+		@apply text-transparent bg-clip-text;
+		background-image: linear-gradient(to right, var(--start-color), var(--end-color));
+	}
+	/*.galindo {
+		font-family: "Galindo", cursive;
+	}*/
+</style>
