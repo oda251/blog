@@ -1,25 +1,25 @@
 ---
 	import Twitter from './links/Twitter.astro';
 	import GitHub from './links/GitHub.astro';
-	const articles: {[lang: string]: any} = {
-		"ja": {
-			"経歴": "早稲田大学 \n 42tokyo"
+	const articles: {[lang: string]: {[key: string]: string[]}} = {
+		"jp": {
+			"経歴": ["早稲田大学", "42tokyo"]
 		},
 		"en": {
-			"Past": "waseda univ \n 42tokyo"
+			"Past": ["waseda univ", "42tokyo"]
 		}
 	}
-	const locale = Astro.currentLocale;
+	const locale = Astro.currentLocale ? Astro.currentLocale : "en";
 ---
 
 <div class="border border-gray p-3 rounded-md">
 	<h4 class="text-3xl border-b border-gray">Profile</h4>
 	{
-		Object.entries(articles["ja"]).map(([key, val]) => {
+		Object.entries(articles[locale]).map(([key, val]) => {
 			return (
 				<div>
 					<h5 class="text-xl">{key}</h5>
-					<p>{val}</p>
+					{val.map((elem) => <p>{elem}</p>)}
 				</div>
 			)
 		})

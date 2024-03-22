@@ -14,8 +14,11 @@ export default defineConfig({
 	}),
 	integrations: [tailwind(), react()],
 	i18n: {
-		locales: ["en", "ja"],
-		defaultLocale: "ja",
+		locales: ["en", "jp"],
+		defaultLocale: "jp",
+		routing: {
+			prefixDefaultLocale: true,
+		}
 	},
 	imageService: 'imgix',
 });
