@@ -1,35 +1,39 @@
 ---
 interface Props {
-	title: string;
-	img: string;
-	infras: string[];
-	langs: string[];
-	href: string;
+	info: ProductInfo;
 }
 
-const { title, img, infras, langs, href } = Astro.props;
+const locale = Astro.currentLocale ? Astro.currentLocale : 'en';
+
+const { info } = Astro.props;
 ---
 
 <script src="https://kit.fontawesome.com/ffad7d90c7.js" crossorigin="anonymous"></script>
 
 <div class="flex flex-col">
-	<h3 class ="w-full text-center"> {title} </h3>
-	<img src={img} alt="" class="w-full" />
+	<h3 class ="w-full text-center"> {
+		locale === 'en' ? info.title.en : info.title.ja
+	} </h3>
+	<img src={info.thumbnail} alt="" class="w-full" />
 	<div class="flex flex-row justify-center">
-		{infras.map((infra) => (
+		{info.infras.map((infra, index) => (
 			<div class="flex flex-row items-center">
-				<i class="fas fa-check-circle"></i>
-				<p>{infra}</p>
+				<p>{infra.text}</p>
+				{index !== info.infras.length - 1 &&
+					<p>&nbsp;/&nbsp;</p>
+				}
 			</div>
 		))}
 	</div>
 	<div class="flex flex-row justify-center">
-		{langs.map((lang) => (
+		{info.langs.map((lang, index) => (
 			<div class="flex flex-row items-center">
-				<i class="fas fa-check-circle"></i>
-				<p>{lang}</p>
+				<p>{lang.text}</p>
+				{index !== info.langs.length - 1 &&
+					<p>&nbsp;/&nbsp;</p>
+				}
 			</div>
 		))}
 	</div>
-	<a href={href} class="w-full text-center">Learn More</a>
+	<a href={info.href} class="w-full text-center">Learn More</a>
 </div>

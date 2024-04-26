@@ -1,11 +1,25 @@
+import Langs from './langs';
+import Techs from './techs';
+
 const cfwDiscordBot: Product = {
 	title: {
 		en: "Shift Manager Bot",
 		ja: "シフト管理Bot"
 	},
-	img: "cfw-discord-bot.png",
-	infras: ["node.js", "cloudflare workers", "hono", "GAS"],
-	langs: ["javascript", "google apps script"],
+	thumbnail: "assets/cfw-discord-bot-thumb.png",
+	imgs: [
+		"cfw-discord-bot.png",
+	],
+	infras: [
+		Techs.nodejs,
+		Techs.cloudflareWorkers,
+		Techs.gas,
+		Techs.discordApi,
+	],
+	langs: [
+		Langs.js,
+		Langs.gas,
+	],
 	body: {
 		en: `
 			A Discord bot to manage cleaning shifts in 42.
@@ -33,9 +47,19 @@ const portfolio: Product = {
 		en: "Portfolio Site",
 		ja: "ポートフォリオサイト"
 	},
-	img: "portfolio-site.png",
-	infras: ["React", "astro", "tailwind-css", "cloudflare pages"],
-	langs: ["typescript"],
+	thumbnail: "assets/portfolio-site-thumb.png",
+	imgs: [
+		"portfolio-site.png",
+	],
+	infras: [
+		Techs.cloudflarePages,
+		Techs.astro,
+		Techs.tailwind,
+		Techs.react,
+	],
+	langs: [
+		Langs.ts,
+	],
 	body: {
 		en: `
 			This website.
@@ -51,3 +75,10 @@ const portfolio: Product = {
 	github: "https://github.com/oda251/blog",
 	href: "hoge",
 }
+
+const products: Product[] = [
+	cfwDiscordBot,
+	portfolio,
+]
+
+export default products;
