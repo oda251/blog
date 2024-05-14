@@ -5,6 +5,8 @@ interface Props {
 
 const locale = Astro.currentLocale ? Astro.currentLocale : 'en';
 
+const description_detail = locale === 'en' ? "View in detail" : "詳細はこちら";
+
 const { info } = Astro.props;
 ---
 
@@ -35,5 +37,5 @@ const { info } = Astro.props;
 			</div>
 		))}
 	</div>
-	<a href={info.href} class="w-full text-center">Learn More</a>
+	<a href={info.href} class="w-full text-center">{description_detail}</a>
 </div>
