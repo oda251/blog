@@ -21,7 +21,6 @@ const locale = Astro.currentLocale ? Astro.currentLocale : 'en';
 		overflow: hidden;	/*必須*/
 		white-space: nowrap;	/*必須*/
 		line-height:1.4;
-		font-weight:700;
 		@apply animate-typing;
 	}
 </style>
@@ -32,7 +31,7 @@ const locale = Astro.currentLocale ? Astro.currentLocale : 'en';
         if (element) {
 			const textContent = element.textContent;
 			if (!textContent) return;
-            const textLength = textContent.length + 6;
+            const textLength = textContent.length + 14;
             element.style.width = `${textLength}ch`;
         }
     });
