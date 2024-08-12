@@ -1,0 +1,34 @@
+---
+const locale = Astro.currentLocale ? Astro.currentLocale : 'en';
+const oppositeLocale = locale === 'en' ? 'jp' : 'en';
+const switchedUrl = Astro.request.url.replace(`/${locale}`, `/${oppositeLocale}`);
+---
+
+<script src="https://kit.fontawesome.com/ffad7d90c7.js" crossorigin="anonymous"></script>
+
+<header class="w-full flex flex-col h-[2.2rem] bg-gray-800 justify-center">
+	<div class="h-full flex items-center ml-auto mr-5 text-[0.65rem]">
+		<a href=`/${locale}` class="px-1 py-[0.2rem]">
+			<i class="fa-solid fa-home"> HOME </i>
+		</a>
+		{ locale === 'jp' &&
+			<a href=`/${locale}/blog` class="ml-2 px-1 py-[0.2rem]">
+				<i class="fa-solid fa-blog"> BLOG </i>
+			</a>
+		}
+		<a href={switchedUrl} class="ml-2 px-1 py-[0.2rem]">
+			<i class="fa-solid">en ⇔ jp</i>
+		</a>
+	</div>
+</header>
+
+<style>
+	header a {
+		line-height: 100%;
+		text-align: center;
+		text-decoration: none;
+		background-color: rgb(105, 43, 164);
+		color: rgb(218, 218, 218);
+		border-radius: 0.2rem;
+	}
+</style>

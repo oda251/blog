@@ -1,19 +1,11 @@
 ---
+const { class: className, showIcon, showId } = Astro.props
 const username = "oda251"
 const url = `https://www.github.com/${username}`
 const icon="fa-github"
 ---
 
-<a href={ url }>
-	<i class=`fa-brands ${icon}`></i>
+<a class={className} href={url}>
+	{showIcon && <i class=`fa-brands ${icon}`></i>}
+	{showId && <span>{username}</span>}
 </a>
-
-<style>
-	/*a {
-		padding: 0.5rem 1rem;
-		color: white;
-		background-color: #4c1d95;
-		text-decoration: none;
-		border-radius: 0.1rem;
-	}*/
-</style>
