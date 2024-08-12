@@ -2,7 +2,6 @@
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import Greeting from '../../components/Greeting.astro'
 const title = "Home"
-const myName = 'yoda'
 const locale = Astro.currentLocale ? Astro.currentLocale : 'en';
 ---
 <BaseLayout title={ title }>
@@ -31,7 +30,9 @@ const locale = Astro.currentLocale ? Astro.currentLocale : 'en';
     document.addEventListener('DOMContentLoaded', () => {
         const element = document.getElementById('message');
         if (element) {
-            const textLength = element.textContent.length + 6;
+			const textContent = element.textContent;
+			if (!textContent) return;
+            const textLength = textContent.length + 6;
             element.style.width = `${textLength}ch`;
         }
     });
