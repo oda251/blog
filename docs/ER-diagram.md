@@ -1,0 +1,7 @@
+```mermaid
+---
+title: "blog"
+---
+erDiagram
+	
+```
