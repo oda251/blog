@@ -1,6 +1,8 @@
 ---
+import { DateTime } from 'luxon'
+
 let message: string, icon: string, style: string;
-const time = new Date().getHours()
+const time = DateTime.now().setZone('Asia/Tokyo').hour;
 if (time < 5) {
 	message = "Good night"
 	icon = "fa-bed"
