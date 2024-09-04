@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+import tweetRepository from '../../../repository/tweetRepository'
+
+interface PageProps {
+  page: string
+}
+
+const { page } = Astro.props as PageProps;
+const pageNumber = page ? parseInt(page) : 1;
+
+const contentSizeInPage = 20;
+
+let tweets = await tweetRepository.getTweets();
+
+if (pageNumber < 1 || pageNumber * contentSizeInPage > tweets.length) {
+  return new Response("Not Found", { status: 404 });
+}
+
+
+const title = "Blog"
+
+---
+
+<BaseLayout title={title}>
+  {if (page) {
+	<h1>Page: {page}</h1>
+  }}
+  <ul>
+	{tweets.map((tweet) => (
+	  <li key={tweet.id}>{tweet.text}</li>
+	))}
+  </ul>
+</BaseLayout>

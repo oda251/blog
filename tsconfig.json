@@ -7,5 +7,5 @@
 	},
 	"include": [
 		"src/entities/types/*.d.ts"
-	]
+, "src/entities/types/BqSchema.d.ts", "src/entities/types/Product.d.ts", "src/entities/types/Utils.d.ts"	]
 }
