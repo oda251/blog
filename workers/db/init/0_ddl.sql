@@ -5,4 +5,5 @@ CREATE TABLE IF NOT EXISTS tweet.tweets (
 	ip_address STRING(32),
 	created_at TIMESTAMP,
 	PRIMARY KEY(id) NOT ENFORCED
+	AUTO 
 );
