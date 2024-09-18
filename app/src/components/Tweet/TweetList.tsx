@@ -37,7 +37,7 @@ const TweetList: React.FC<TweetListProps> = ({ state, loadMoreTweets }) => {
     const ref = useRef<HTMLDivElement>(null);
     const prevHeightRef = useRef<number | null>(null);
 
-    useLayoutEffect(() => {
+    useEffect(() => {
       const updateHeight = () => {
         if (ref.current) {
             const height = ref.current.getBoundingClientRect().height;
