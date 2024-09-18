@@ -1,0 +1,41 @@
+{
+  "name": "flat-lake-b908",
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro build && wrangler pages dev ./dist",
+    "astro": "astro",
+    "deploy": "astro build && wrangler pages deploy ./dist",
+    "build-cf-types": "wrangler types"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.3",
+    "@astrojs/react": "^3.6.2",
+    "@astrojs/tailwind": "^5.1.0",
+    "@astrojs/vercel": "^7.8.0",
+    "@fortawesome/fontawesome-svg-core": "^6.5.1",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "@google-cloud/bigquery": "^7.9.0",
+    "astro": "^4.15.4",
+    "autoprefixer": "^10.4.20",
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
+    "moment-timezone": "^0.5.45",
+    "pg": "^8.12.0",
+    "postcss": "^8.4.45",
+    "postcss-load-config": "^6.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-window": "^1.8.10",
+    "tailwindcss": "^3.4.10",
+    "typescript": "^5.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.3",
+    "@types/pg": "^8.11.8",
+    "@types/react-window": "^1.8.8"
+  }
+}

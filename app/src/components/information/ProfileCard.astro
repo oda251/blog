@@ -1,0 +1,13 @@
+---
+	import Twitter from '../links/Twitter.astro';
+	import GitHub from '../links/GitHub.astro';
+	const { class: className, style: styleName } = Astro.props
+	const locale = Astro.currentLocale ? Astro.currentLocale : "en";
+---
+
+<div class={className} style={styleName}>
+	<div class="flex gap-4 text-3xl">
+		<Twitter showIcon="True" />
+		<GitHub showIcon="True"/>
+	</div>
+</div>
