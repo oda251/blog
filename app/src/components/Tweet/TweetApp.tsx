@@ -33,7 +33,7 @@ export class TweetApp extends React.Component<TweetAppProps, TweetAppState> {
   loadMoreTweets = async () => {
     if (!this.state.hasMore || this.state.is_loading) return;
     this.setState({ is_loading: true }, async () => {
-      const response = await axios.get(`/api/tweets?page=${this.state.page + 1}`);
+      const response = await axios.get(`/api/tweets?lastId=${this.state.tweets[this.state.tweets.length - 1].id}`);
       if (response.status === 200) {
         const newTweets = await response.data;
         if (newTweets.length > 0) {

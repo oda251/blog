@@ -4,11 +4,11 @@ import type Tweet from "../../entities/types/Tweet";
 import { validateTweet } from "../../entities/validate";
 
 export const GET: APIRoute = async ({ url }) => {
-	const page = parseInt(url.searchParams.get("page") || "1");
+	const lastId = url.searchParams.get("lastId");
 
 	try {
 		const tweetRepository: TweetRepository = new TweetRepository();
-		const tweets = await tweetRepository.fetchTweetByPage(page);
+		const tweets = await tweetRepository.fetchTweetByLastId(lastId);
 		return new Response(JSON.stringify(tweets), {
 			status: 200,
 			headers: { "Content-Type": "application/json" }

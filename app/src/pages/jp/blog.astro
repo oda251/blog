@@ -5,7 +5,7 @@ import TweetRepository from '../../repository/tweetRepository'
 const title = 'blog'
 
 const repository = new TweetRepository()
-const initTweets = await repository.fetchTweetByPage(1)
+const initTweets = await repository.fetchTweetByLastId(null)
 ---
 
 <BaseLayout title={title}>
