@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import TweetEditor from './TweetEditor'; // エディタコンポーネントのインポート
+import TweetEditor from './TweetEditor';
 
 const ToggleTweetEditor: React.FC = () => {
   const [isEditorVisible, setIsEditorVisible] = useState(false);

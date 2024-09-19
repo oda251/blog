@@ -1,14 +1,16 @@
 import type { APIRoute } from "astro";
-import TweetRepository from "../../repository/tweetRepository";
-import type Tweet from "../../entities/types/Tweet";
+import tweetRepository from "../../repository/tweetRepository";
+import type { Tweet } from "../../entities/types/Tweet";
 import { validateTweet } from "../../entities/validate";
 
 export const GET: APIRoute = async ({ url }) => {
-	const lastId = url.searchParams.get("lastId");
+	const lastIdStr = url.searchParams.get("lastId");
+	const lastId = lastIdStr ? parseInt(lastIdStr) : null;
+	const tagIdStr = url.searchParams.get("tagId");
+	const tagId = tagIdStr ? parseInt(tagIdStr) : null;
 
 	try {
-		const tweetRepository: TweetRepository = new TweetRepository();
-		const tweets = await tweetRepository.fetchTweetByLastId(lastId);
+		const tweets = await tweetRepository.fetchTweetByLastId(lastId, tagId);
 		return new Response(JSON.stringify(tweets), {
 			status: 200,
 			headers: { "Content-Type": "application/json" }
@@ -39,7 +41,6 @@ export const POST: APIRoute = async ({ request }) => {
 		});
 	}
 	try {
-		const tweetRepository: TweetRepository = new TweetRepository();
 		await tweetRepository.postTweet(tweet);
 		return new Response(JSON.stringify(tweet), {
 			status: 200,

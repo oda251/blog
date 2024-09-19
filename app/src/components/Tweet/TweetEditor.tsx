@@ -3,21 +3,25 @@ import React, { useState } from "react";
 import axios from "axios";
 import { validateTweet } from "../../entities/validate";
 import useWindowWidth from "../../utils/useWindowWidth";
+import { TweetWithTags } from "../../entities/types/Tweet";
+import TweetContext from "./TweetContext";
 
 interface TweetEditorProps {
-  reloadTweets?: () => void;
 }
 
-const TweetEditor: React.FC<TweetEditorProps> = ({ reloadTweets }) => {
-  const [tweet, setTweet] = useState<Tweet>({
+const TweetEditor: React.FC<TweetEditorProps> = () => {
+  const [tweet, setTweet] = useState<TweetWithTags>({
     content: "",
     author: "",
     ip_address: "",
     created_at: "",
+    tagIds: [],
   });
   const [isPosting, setIsPosting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const windowWidth = useWindowWidth();
+  const tagMap = React.useContext(TweetContext).tagMap!;
+  const [tagSelection, setTagSelection] = useState<Map<number, boolean>>(new Map());
+  const reloadTweets = React.useContext(TweetContext).reloadTweets;
 
   const postTweet = async (): Promise<void> => {
     if (isPosting) return;
@@ -49,6 +53,10 @@ const TweetEditor: React.FC<TweetEditorProps> = ({ reloadTweets }) => {
     }
   };
 
+  const toggleTagSelection = (tagId: number): void => {
+    setTagSelection(new Map(tagSelection.set(tagId, !tagSelection.get(tagId))));
+  };
+
   return (
     <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg w-4/5 sm:w-full">
       <div className="mb-4">
@@ -67,6 +75,20 @@ const TweetEditor: React.FC<TweetEditorProps> = ({ reloadTweets }) => {
           value={tweet.content}
           onChange={(e) => setTweet({ ...tweet, content: e.target.value })}
         ></textarea>
+      </div>
+      <div>
+        <label className="block text-gray-700 text-sm font-bold mb-2">Tags</label>
+        <div className="flex flex-wrap">
+          {Array.from(tagMap.entries()).map(([tagId, tagName]) => (
+            <button
+              key={tagId}
+              className={`text-xs text-gray-400 bg-gray-800 px-1 py-0.5 rounded-md mr-1 mb-1 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              onClick={() => toggleTagSelection(tagId)}
+            >
+              {tagName}
+            </button>
+          ))}
+        </div>
       </div>
       <button
         className={`w-full text-white py-2 rounded-md ${

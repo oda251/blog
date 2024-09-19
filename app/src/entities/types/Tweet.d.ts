@@ -1,4 +1,4 @@
-interface Tweet {
+export interface Tweet {
     id?: number;
     content: string;
     author: string;
@@ -6,4 +6,11 @@ interface Tweet {
     created_at?: string;
 }
 
-export default Tweet;
+export interface Tag {
+    id?: number;
+    name: string;
+}
+
+export interface TweetWithTags extends Tweet {
+    tagIds: number[];
+}

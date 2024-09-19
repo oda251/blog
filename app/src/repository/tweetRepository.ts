@@ -1,13 +1,16 @@
-import type Tweet from '../entities/types/Tweet';
+import type { Tweet, Tag, TweetWithTags } from '../entities/types/Tweet';
 import pg from 'pg';
 import moment from 'moment-timezone';
 import { validateTweet } from '../entities/validate';
 
 const { Client } = pg;
 
+export let tagsCache: Map<number, string> = new Map<number, string>();
+
 class TweetRepository {
 	private client: InstanceType<typeof Client>;
 	private static pageSize: number = 30;
+	private tagsCache: Map<number, string>;
 
 	constructor() {
 		const url = process.env.DATABASE_URL;
@@ -17,13 +20,17 @@ class TweetRepository {
 		this.client = new Client(url);
 	}
 
+	async initialize() {
+		await this.client.connect();
+		this.tagsCache = await this.fetchTags();
+	}
+
 	async fetchAllTweet(): Promise<Tweet[]> {
 		const query = `
 			SELECT *
 			FROM tweets
 			ORDER BY created_at DESC;
 			`;
-		await this.client.connect();
 		const result = await this.client.query(query);
 		return result.rows.map((row: any) => ({
 			...row,
@@ -31,34 +38,80 @@ class TweetRepository {
 		})) as Tweet[];
 	}
 
-	async fetchTweetByLastId(lastId: string | null): Promise<Tweet[]> {
+	async fetchTweetByLastId(lastId: number | null, tagId?: number | null): Promise<TweetWithTags[]> {
 		let query: string;
 		let params: any[];
-		if (lastId) {
-			query = `
-				SELECT *
-				FROM tweets
-				WHERE id < $1
-				ORDER BY created_at DESC
-				LIMIT $2;
-			`;
-			params = [lastId, TweetRepository.pageSize];
+		let result: pg.QueryResult<TweetWithTags>;
+		if (tagId) {
+			if (lastId) {
+				query = `
+					SELECT t.*, array_agg(tt.tag_id) as tags
+					FROM tweets t
+					JOIN tweets_tags tt ON t.id = tt.tweet_id
+					WHERE t.id < $1 AND tt.tag_id = $2
+					GROUP BY t.id
+					ORDER BY t.created_at DESC
+					LIMIT $3;
+				`;
+				params = [lastId, tagId, TweetRepository.pageSize];
+			  } else {
+				query = `
+					SELECT t.*, array_agg(tt.tag_id) as tags
+					FROM tweets t
+					JOIN tweets_tags tt ON t.id = tt.tweet_id
+					WHERE tt.tag_id = $1
+					GROUP BY t.id
+					ORDER BY t.created_at DESC
+					LIMIT $2;
+				`;
+				params = [tagId, TweetRepository.pageSize];
+			  }
 		} else {
-			query = `
-				SELECT *
-				FROM tweets
-				ORDER BY created_at DESC
-				LIMIT $1;
-			`;
-			params = [TweetRepository.pageSize];
+			if (lastId) {
+				query = `
+					SELECT t.*, array_agg(tt.tag_id) as tags
+					FROM tweets t
+					LEFT JOIN tweets_tags tt ON t.id = tt.tweet_id
+					WHERE t.id < $1
+					GROUP BY t.id
+					ORDER BY t.created_at DESC
+					LIMIT $2;
+			  	`;
+				params = [lastId, TweetRepository.pageSize];
+			} else {
+				query = `
+					SELECT t.*, array_agg(tt.tag_id) as tags
+					FROM tweets t
+					LEFT JOIN tweets_tags tt ON t.id = tt.tweet_id
+					GROUP BY t.id
+					ORDER BY t.created_at DESC
+					LIMIT $1;
+				`;
+				params = [TweetRepository.pageSize];
+			}
 		}
-        await this.client.connect();
-        const result = await this.client.query(query, params);
+        result = await this.client.query(query, params);
         return result.rows.map((row: any) => ({
             ...row,
             created_at: moment(row.created_at).tz('Asia/Tokyo').format('YYYY-MM-DD HH:mm:ss')
-        })) as Tweet[];
+        })) as TweetWithTags[];
     }
+
+	async fetchTags(): Promise<Map<number, string>> {
+		if (this.tagsCache) {
+			return this.tagsCache;
+		}
+		const query = `
+			SELECT *
+			FROM tags;
+		`;
+		const result: pg.QueryResult<Tag> = await this.client.query(query);
+		const tags = new Map<number, string>();
+		for (const row of result.rows) {
+			tags.set(row.id!, row.name);
+		}
+		return tags;
+	}
 
 	async fetchNewTweet(date: string): Promise<Tweet[]> {
 		const query = `
@@ -67,7 +120,6 @@ class TweetRepository {
 			WHERE created_at >= $1
 			ORDER BY created_at DESC;
 		`;
-		await this.client.connect();
 		const result = await this.client.query(query, [date]);
 		return result.rows.map((row: any) => ({
 			...row,
@@ -81,9 +133,12 @@ class TweetRepository {
 			INSERT INTO tweets (content, author, ip_address)
 			VALUES ($1, $2, $3);
 		`;
-		await this.client.connect();
 		await this.client.query(query, [tweet.content, tweet.author, tweet.ip_address]);
 	}
 }
 
-export default TweetRepository;
+const tweetRepository = new TweetRepository();
+await tweetRepository.initialize();
+
+
+export default tweetRepository;

@@ -1,13 +1,13 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro'
 import { TweetApp } from '../../components/Tweet/TweetApp'
-import TweetRepository from '../../repository/tweetRepository'
+import tweetRepository from '../../repository/tweetRepository'
 const title = 'blog'
 
-const repository = new TweetRepository()
-const initTweets = await repository.fetchTweetByLastId(null)
+const initTweets = await tweetRepository.fetchTweetByLastId(null)
+const tagMap = await tweetRepository.fetchTags()
 ---
 
 <BaseLayout title={title}>
-  <TweetApp client:only="react" tweets={initTweets} />
+  <TweetApp client:only="react" tweets={initTweets} tagMap={tagMap} />
 </BaseLayout>
