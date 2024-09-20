@@ -1,11 +1,12 @@
 import React from 'react';
+import type { TagMap } from '../../entities/types/Tweet';
 
 interface TweetContextType {
   loadMoreTweets?: () => void;
   reloadTweets?: () => void;
-  clickTag?: (tagId: number) => void;
-  tagMap?: Map<number, string>;
-  convertTagIdToName?: (tagId: number) => string;
+  clickTag?: (tagId: string) => void;
+  tagMap?: TagMap;
+  convertTagIdToName?: (tagId: string) => string;
 }
 
 const TweetContext = React.createContext<TweetContextType>({

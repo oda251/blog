@@ -1,5 +1,5 @@
 export interface Tweet {
-    id?: number;
+    id?: string;
     content: string;
     author: string;
     ip_address: string;
@@ -7,10 +7,12 @@ export interface Tweet {
 }
 
 export interface Tag {
-    id?: number;
+    id?: string;
     name: string;
 }
 
 export interface TweetWithTags extends Tweet {
-    tagIds: number[];
+    tag_id_list: string[];
 }
+
+export type TagMap = Map<string, string>;

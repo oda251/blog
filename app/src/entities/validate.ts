@@ -1,6 +1,6 @@
-import type Tweet from "./types/Tweet";
+import type { TweetWithTags } from "./types/Tweet";
 
-export function validateTweet(tweet: Tweet | null) {
+export function validateTweet(tweet: TweetWithTags | null) {
 	if (!tweet) {
 		throw new Error('tweet is null');
 	}

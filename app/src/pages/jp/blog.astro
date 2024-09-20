@@ -4,7 +4,7 @@ import { TweetApp } from '../../components/Tweet/TweetApp'
 import tweetRepository from '../../repository/tweetRepository'
 const title = 'blog'
 
-const initTweets = await tweetRepository.fetchTweetByLastId(null)
+const initTweets = await tweetRepository.fetchTweetsByOldId(null)
 const tagMap = await tweetRepository.fetchTags()
 ---
 

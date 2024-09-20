@@ -1,9 +1,7 @@
-import type Tweet from "../../entities/types/Tweet";
 import React, { useState } from "react";
 import axios from "axios";
 import { validateTweet } from "../../entities/validate";
-import useWindowWidth from "../../utils/useWindowWidth";
-import { TweetWithTags } from "../../entities/types/Tweet";
+import type { TweetWithTags } from "../../entities/types/Tweet";
 import TweetContext from "./TweetContext";
 
 interface TweetEditorProps {
@@ -15,12 +13,12 @@ const TweetEditor: React.FC<TweetEditorProps> = () => {
     author: "",
     ip_address: "",
     created_at: "",
-    tagIds: [],
+    tag_id_list: [],
   });
   const [isPosting, setIsPosting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const tagMap = React.useContext(TweetContext).tagMap!;
-  const [tagSelection, setTagSelection] = useState<Map<number, boolean>>(new Map());
+  const [tagSelection, setTagSelection] = useState<Map<string, boolean>>(new Map());
   const reloadTweets = React.useContext(TweetContext).reloadTweets;
 
   const postTweet = async (): Promise<void> => {
@@ -29,6 +27,11 @@ const TweetEditor: React.FC<TweetEditorProps> = () => {
     setIsPosting(true);
     try {
       validateTweet(tweet);
+      tagSelection.forEach((selected, tagId) => {
+        if (selected) {
+          tweet.tag_id_list.push(tagId);
+        }
+      });
       setErrorMessage(null);
       const response = await axios.post("/api/tweets", tweet, {
         headers: {
@@ -40,7 +43,9 @@ const TweetEditor: React.FC<TweetEditorProps> = () => {
           ...tweet,
           author: "",
           content: "",
+          tag_id_list: [],
         });
+        setTagSelection(new Map());
         if (reloadTweets) reloadTweets();
       } else {
         console.log(response.data);
@@ -53,7 +58,7 @@ const TweetEditor: React.FC<TweetEditorProps> = () => {
     }
   };
 
-  const toggleTagSelection = (tagId: number): void => {
+  const toggleTagSelection = (tagId: string): void => {
     setTagSelection(new Map(tagSelection.set(tagId, !tagSelection.get(tagId))));
   };
 
@@ -68,7 +73,7 @@ const TweetEditor: React.FC<TweetEditorProps> = () => {
           onChange={(e) => setTweet({ ...tweet, author: e.target.value })}
         />
       </div>
-      <div className="mb-4">
+      <div className="mb-2">
         <label className="block text-gray-700 text-sm font-bold mb-2">Content</label>
         <textarea
           className="w-full px-3 py-2 border rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -76,13 +81,15 @@ const TweetEditor: React.FC<TweetEditorProps> = () => {
           onChange={(e) => setTweet({ ...tweet, content: e.target.value })}
         ></textarea>
       </div>
-      <div>
+      <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2">Tags</label>
         <div className="flex flex-wrap">
           {Array.from(tagMap.entries()).map(([tagId, tagName]) => (
             <button
               key={tagId}
-              className={`text-xs text-gray-400 bg-gray-800 px-1 py-0.5 rounded-md mr-1 mb-1 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              className={`text-xs px-1 py-0.5 rounded-md mr-1 mb-1 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                tagSelection.get(tagId) ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"
+                }`}
               onClick={() => toggleTagSelection(tagId)}
             >
               {tagName}

@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useEffect, useLayoutEffect, useState, useContext } from "react";
+import React, { useCallback, useRef, useEffect, useContext } from "react";
 import TweetView from "./TweetView";
 import { VariableSizeList as List } from "react-window";
 import type { TweetAppState } from "./TweetApp";
@@ -51,6 +51,8 @@ const TweetList: React.FC<TweetListProps> = ({ state }) => {
       };
       updateHeight();
     }, [index, windowWidth]);
+
+    console.log(index, state.tweets[index].tag_id_list);
 
     return (
       <div style={style}>
