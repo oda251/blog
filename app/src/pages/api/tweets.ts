@@ -1,14 +1,26 @@
 import type { APIRoute } from "astro";
-import TweetRepository from "../../repository/tweetRepository";
-import type Tweet from "../../entities/types/Tweet";
+import tweetRepository from "../../repository/tweetRepository";
+import type { TweetWithTags } from "../../entities/types/Tweet";
 import { validateTweet } from "../../entities/validate";
 
 export const GET: APIRoute = async ({ url }) => {
-	const lastId = url.searchParams.get("lastId");
+	const oldId = url.searchParams.get("oldId");
+	const newId = url.searchParams.get("newId");
+	const tagId = url.searchParams.get("tagId");
 
+	if (oldId && newId) {
+		return new Response(JSON.stringify({ error: "Both oldId and newId are set" }), {
+			status: 400,
+			headers: { "Content-Type": "application/json" }
+		});
+	}
 	try {
-		const tweetRepository: TweetRepository = new TweetRepository();
-		const tweets = await tweetRepository.fetchTweetByLastId(lastId);
+		let tweets: TweetWithTags[];
+		if (!newId) {
+			tweets = await tweetRepository.fetchTweetsByOldId(oldId, tagId);
+		} else {
+			tweets = await tweetRepository.fetchTweetsByNewId(newId, tagId);
+		}
 		return new Response(JSON.stringify(tweets), {
 			status: 200,
 			headers: { "Content-Type": "application/json" }
@@ -29,7 +41,7 @@ export const GET: APIRoute = async ({ url }) => {
 };
 
 export const POST: APIRoute = async ({ request }) => {
-	const tweet = await request.json() as Tweet;
+	const tweet = await request.json() as TweetWithTags;
 	try {
 		validateTweet(tweet);
 	} catch (error) {
@@ -39,7 +51,6 @@ export const POST: APIRoute = async ({ request }) => {
 		});
 	}
 	try {
-		const tweetRepository: TweetRepository = new TweetRepository();
 		await tweetRepository.postTweet(tweet);
 		return new Response(JSON.stringify(tweet), {
 			status: 200,

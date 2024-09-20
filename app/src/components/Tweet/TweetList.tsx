@@ -1,20 +1,20 @@
-import React, { useCallback, useRef, useEffect, useLayoutEffect, useState } from "react";
-import ReactDOM from "react-dom/client";
+import React, { useCallback, useRef, useEffect, useContext } from "react";
 import TweetView from "./TweetView";
 import { VariableSizeList as List } from "react-window";
 import type { TweetAppState } from "./TweetApp";
 import useWindowWidth from "../../utils/useWindowWidth";
+import TweetContext from "./TweetContext";
 
 interface TweetListProps {
   state: TweetAppState;
-  loadMoreTweets?: () => void;
 }
 
-const TweetList: React.FC<TweetListProps> = ({ state, loadMoreTweets }) => {
+const TweetList: React.FC<TweetListProps> = ({ state }) => {
   const pageSize = 30;
   const windowWidth = useWindowWidth();
   const sizeMap = useRef(new Map<number, number>()); // 各アイテムの高さを保存するMap
   const listRef = useRef<List>(null);
+  const loadMoreTweets = useContext(TweetContext).loadMoreTweets;
 
   const handleItemsRendered = useCallback(
     ({ visibleStopIndex }) => {
@@ -51,6 +51,8 @@ const TweetList: React.FC<TweetListProps> = ({ state, loadMoreTweets }) => {
       };
       updateHeight();
     }, [index, windowWidth]);
+
+    console.log(index, state.tweets[index].tag_id_list);
 
     return (
       <div style={style}>

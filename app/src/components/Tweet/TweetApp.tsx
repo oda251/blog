@@ -1,44 +1,42 @@
 import React from 'react';
 import TweetEditor from './TweetEditor';
 import TweetList from './TweetList';
-import type Tweet from '../../entities/types/Tweet';
 import axios from 'axios';
-import ToggleTweetEditor from './ToggleTweetEditor';
+import type { TagMap, TweetWithTags } from '../../entities/types/Tweet';
+import TweetContext from './TweetContext';
 
 interface TweetAppProps {
-	tweets: Tweet[];
+	tweets: TweetWithTags[];
+  readonly tagMap: TagMap;
 }
 
 export interface TweetAppState {
-  tweets: Tweet[];
-  page: number;
+  tweets: TweetWithTags[];
   hasMore: boolean;
   is_loading?: boolean;
   debugInfo: string;
 }
 
 export class TweetApp extends React.Component<TweetAppProps, TweetAppState> {
-  DataContext: React.Context<TweetAppState> = React.createContext(this.state);
-
   constructor(props: TweetAppProps) {
-	super(props);
-	this.state = {
-	  tweets: props.tweets,
-	  page: 1,
-	  hasMore: true,
-	  debugInfo: '',
-	};
+    super(props);
+    this.state = {
+      tweets: props.tweets,
+      hasMore: true,
+      debugInfo: '',
+    };
+    console.log(this.state.tweets[0]);
   }
 
   loadMoreTweets = async () => {
     if (!this.state.hasMore || this.state.is_loading) return;
     this.setState({ is_loading: true }, async () => {
-      const response = await axios.get(`/api/tweets?lastId=${this.state.tweets[this.state.tweets.length - 1].id}`);
+      const url = `/api/tweets?oldId=${this.state.tweets[this.state.tweets.length - 1].id}`;
+      const response = await axios.get(url);
       if (response.status === 200) {
         const newTweets = await response.data;
         if (newTweets.length > 0) {
           this.setState({
-            page: this.state.page + 1,
             tweets: [...this.state.tweets, ...newTweets],
           });
         } else {
@@ -52,26 +50,37 @@ export class TweetApp extends React.Component<TweetAppProps, TweetAppState> {
   }
 
   reloadTweets = async () => {
-	const response = await axios.get(`/api/tweets?page=1`);
-	if (response.status === 200) {
-	  const newTweets = await response.data;
-	  this.setState({
-		tweets: newTweets,
-		page: 1,
-		hasMore: true,
-	  });
-	} else {
-	  this.setState({ hasMore: false });
-	}
+    const url = `/api/tweets?newId=${this.state.tweets[0].id}`;
+    const response = await axios.get(url);
+    if (response.status === 200) {
+      const newTweets = await response.data;
+      this.setState({
+      tweets: [newTweets, ...this.state.tweets],
+      hasMore: true,
+      });
+    } else {
+      this.setState({ hasMore: false });
+    }
+  }
+
+  convertTagIdToName = (tagId: string): string => {
+    const tagName = this.props.tagMap.get(tagId);
+    return tagName ? tagName : 'undefined';
   }
 
   render() {
 	return (
-		<div className='w-full flex flex-col items-center'>
-			<TweetList state={this.state} loadMoreTweets={this.loadMoreTweets}/>
-			<TweetEditor reloadTweets={this.reloadTweets}/>
-      {/* <ToggleTweetEditor /> */}
-		</div>
+    <TweetContext.Provider value={{
+      loadMoreTweets: this.loadMoreTweets,
+      reloadTweets: this.reloadTweets,
+      tagMap: this.props.tagMap,
+      convertTagIdToName: this.convertTagIdToName,
+    }}>
+      <div className='w-full flex flex-col items-center'>
+        <TweetList state={this.state} />
+        <TweetEditor />
+      </div>
+    </TweetContext.Provider>
 	);
   }
 }

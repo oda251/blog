@@ -1,9 +1,18 @@
-interface Tweet {
-    id?: number;
+export interface Tweet {
+    id?: string;
     content: string;
     author: string;
     ip_address: string;
     created_at?: string;
 }
 
-export default Tweet;
+export interface Tag {
+    id?: string;
+    name: string;
+}
+
+export interface TweetWithTags extends Tweet {
+    tag_id_list: string[];
+}
+
+export type TagMap = Map<string, string>;
