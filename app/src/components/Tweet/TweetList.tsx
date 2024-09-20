@@ -52,8 +52,6 @@ const TweetList: React.FC<TweetListProps> = ({ state }) => {
       updateHeight();
     }, [index, windowWidth]);
 
-    console.log(index, state.tweets[index].tag_id_list);
-
     return (
       <div style={style}>
         <TweetView
@@ -67,7 +65,7 @@ const TweetList: React.FC<TweetListProps> = ({ state }) => {
   };
 
   return (
-    <div className="max-w-xl w-full px-6 mx-auto flex flex-col items-center justify-center p-4">
+    <div className="w-full flex flex-col items-center justify-center pb-1">
       <List
         ref={listRef}
         height={700}

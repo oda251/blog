@@ -108,7 +108,7 @@ class TweetRepository {
 				SELECT t.*, array_agg(tt.tag_id) as tag_id_list
 				FROM tweets t
 				LEFT JOIN tweets_tags tt ON t.id = tt.tweet_id
-				WHERE t.id < $1 AND tt.tag_id = $2
+				WHERE t.id > $1 AND tt.tag_id = $2
 				GROUP BY t.id
 				ORDER BY t.created_at DESC
 				LIMIT $3;
@@ -119,7 +119,7 @@ class TweetRepository {
 				SELECT t.*, array_agg(tt.tag_id) as tag_id_list
 				FROM tweets t
 				LEFT JOIN tweets_tags tt ON t.id = tt.tweet_id
-				WHERE t.id < $1
+				WHERE t.id > $1
 				GROUP BY t.id
 				ORDER BY t.created_at DESC
 				LIMIT $2;
@@ -129,7 +129,8 @@ class TweetRepository {
 		const result: pg.QueryResult<TweetWithTags> = await this.client.query(query, params);
 		return result.rows.map((row: any) => ({
 			...row,
-			created_at: moment(row.created_at).tz('Asia/Tokyo').format('YYYY-MM-DD HH:mm:ss')
+			created_at: moment(row.created_at).tz('Asia/Tokyo').format('YYYY-MM-DD HH:mm:ss'),
+			tag_id_list: row.tag_id_list[0] ? row.tag_id_list : []
 		})) as TweetWithTags[];
 	}
 

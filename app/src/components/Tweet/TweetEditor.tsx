@@ -3,6 +3,7 @@ import axios from "axios";
 import { validateTweet } from "../../entities/validate";
 import type { TweetWithTags } from "../../entities/types/Tweet";
 import TweetContext from "./TweetContext";
+import TagSelector from "./TagSelector";
 
 interface TweetEditorProps {
 }
@@ -17,15 +18,15 @@ const TweetEditor: React.FC<TweetEditorProps> = () => {
   });
   const [isPosting, setIsPosting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const tagMap = React.useContext(TweetContext).tagMap!;
   const [tagSelection, setTagSelection] = useState<Map<string, boolean>>(new Map());
-  const reloadTweets = React.useContext(TweetContext).reloadTweets;
+  const postTweet = React.useContext(TweetContext).postTweet;
 
-  const postTweet = async (): Promise<void> => {
+  const onClick = async (): Promise<void> => {
     if (isPosting) return;
 
     setIsPosting(true);
     try {
+      if (!postTweet) throw new Error("postTweet is not defined");
       validateTweet(tweet);
       tagSelection.forEach((selected, tagId) => {
         if (selected) {
@@ -33,12 +34,8 @@ const TweetEditor: React.FC<TweetEditorProps> = () => {
         }
       });
       setErrorMessage(null);
-      const response = await axios.post("/api/tweets", tweet, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (response.status === 200) {
+      const successed = await postTweet(tweet);
+      if (successed) {
         setTweet({
           ...tweet,
           author: "",
@@ -46,9 +43,7 @@ const TweetEditor: React.FC<TweetEditorProps> = () => {
           tag_id_list: [],
         });
         setTagSelection(new Map());
-        if (reloadTweets) reloadTweets();
       } else {
-        console.log(response.data);
         throw new Error("Server error");
       }
     } catch (error: any) {
@@ -61,6 +56,7 @@ const TweetEditor: React.FC<TweetEditorProps> = () => {
   const toggleTagSelection = (tagId: string): void => {
     setTagSelection(new Map(tagSelection.set(tagId, !tagSelection.get(tagId))));
   };
+  const tagSelectorIsSelected = (tagId: string): boolean => tagSelection.get(tagId) || false;
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg w-4/5 sm:w-full">
@@ -83,25 +79,19 @@ const TweetEditor: React.FC<TweetEditorProps> = () => {
       </div>
       <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2">Tags</label>
-        <div className="flex flex-wrap">
-          {Array.from(tagMap.entries()).map(([tagId, tagName]) => (
-            <button
-              key={tagId}
-              className={`text-xs px-1 py-0.5 rounded-md mr-1 mb-1 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                tagSelection.get(tagId) ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-700"
-                }`}
-              onClick={() => toggleTagSelection(tagId)}
-            >
-              {tagName}
-            </button>
-          ))}
-        </div>
+        <TagSelector
+          isSelected={tagSelectorIsSelected}
+          onClick={toggleTagSelection}
+          className="text-xs mb-1 px-1 py-0.5 mr-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          classNameSelected="bg-blue-500 text-white"
+          classNameUnselected="bg-gray-200 text-gray-700"
+        />
       </div>
       <button
         className={`w-full text-white py-2 rounded-md ${
           isPosting ? "bg-slate-500" : "bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
         }`}
-        onClick={postTweet}
+        onClick={onClick}
       >
         {isPosting ? "Posting..." : "Post"}
       </button>
