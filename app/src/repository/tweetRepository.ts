@@ -1,16 +1,16 @@
-import type { Tag, TweetWithTags } from '../entities/types/Tweet';
+import type { Tag, TagMap, TweetWithTags } from '../entities/types/Tweet';
 import pg from 'pg';
 import moment from 'moment-timezone';
 import { validateTweet } from '../entities/validate';
+import TweetCache from './tweetCache';
 
 const { Client } = pg;
-
-export let tagsCache: Map<string, string> = new Map<string, string>();
 
 class TweetRepository {
 	private client: InstanceType<typeof Client>;
 	private static pageSize: number = 30;
-	private tagsCache: Map<string, string>;
+	private tagsCache: TagMap;
+	private cache: TweetCache;
 
 	constructor() {
 		const url = process.env.DATABASE_URL;
@@ -18,6 +18,7 @@ class TweetRepository {
 			throw new Error('DATABASE_URL is not set');
 		}
 		this.client = new Client(url);
+		this.cache = new TweetCache();
 	}
 
 	async initialize() {
@@ -26,6 +27,9 @@ class TweetRepository {
 	}
 
 	async fetchTweetsByOldId(oldId: string | null, tagId?: string | null): Promise<TweetWithTags[]> {
+		if (!oldId && this.cache.getTweets(tagId)) {
+			return this.cache.getTweets(tagId)!;
+		}
 		let query: string;
 		let params: any[];
 		if (tagId) {
@@ -77,11 +81,15 @@ class TweetRepository {
 			}
 		}
         const result: pg.QueryResult<TweetWithTags> = await this.client.query(query, params);
-        return result.rows.map((row: any) => ({
+        const tweets = result.rows.map((row: any) => ({
             ...row,
             created_at: moment(row.created_at).tz('Asia/Tokyo').format('YYYY-MM-DD HH:mm:ss'),
 			tag_id_list: row.tag_id_list[0] ? row.tag_id_list : []
         })) as TweetWithTags[];
+		if (!oldId) {
+			this.cache.setTweets(tagId, tweets);
+		}
+		return tweets;
     }
 
 	async fetchTags(): Promise<Map<string, string>> {
@@ -154,6 +162,7 @@ class TweetRepository {
 				await this.client.query(query, [tweetId, tagId]);
 			}
 			await this.client.query('COMMIT');
+			this.cache.resetTweets(tweet.tag_id_list);
 		} catch (e) {
 			await this.client.query('ROLLBACK');
 			throw e;
