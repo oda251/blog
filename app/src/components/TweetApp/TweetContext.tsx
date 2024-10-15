@@ -5,6 +5,7 @@ interface TweetContextType {
   loadMoreTweets?: () => Promise<void>;
   loadNewTweets?: () => Promise<void>;
   postTweet?: (tweet: TweetWithTags) => Promise<boolean>;
+  deleteTweet?: (tweetId: string, password: string) => Promise<void>;
   clickTag?: (tagId: string) => void;
   tagMap?: TagMap;
   convertTagIdToName?: (tagId: string) => string;

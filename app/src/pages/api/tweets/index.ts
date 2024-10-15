@@ -1,7 +1,8 @@
 import type { APIRoute } from "astro";
-import tweetRepository from "../../repository/tweetRepository";
-import type { TweetWithTags } from "../../entities/types/Tweet";
-import { validateTweet } from "../../entities/validate";
+import tweetRepository from "../../../repository/tweetRepository";
+import type { TweetWithTags } from "../../../entities/types/Tweet";
+import { validateTweet } from "../../../entities/validate";
+import { authenticateAdmin } from "../../../entities/auth";
 
 export const GET: APIRoute = async ({ url }) => {
 	const oldId = url.searchParams.get("oldId");
@@ -53,6 +54,48 @@ export const POST: APIRoute = async ({ request }) => {
 	try {
 		await tweetRepository.postTweet(tweet);
 		return new Response(JSON.stringify(tweet), {
+			status: 200,
+			headers: { "Content-Type": "application/json" }
+		});
+	} catch (e) {
+		if (e instanceof Error) {
+			return new Response(JSON.stringify({ error: e.message }), {
+				status: 500,
+				headers: { "Content-Type": "application/json" }
+			});
+		} else {
+			return new Response(JSON.stringify({ error: "Internal Server Error" }), {
+				status: 500,
+				headers: { "Content-Type": "application/json" }
+			});
+		}
+	}
+}
+
+export const DELETE: APIRoute = async ({ url, request }) => {
+	const tweetId = url.searchParams.get("tweetId");
+	const password = request.headers.get("password");
+	if (!password) {
+		return new Response(JSON.stringify({ error: "password is not set" }), {
+			status: 400,
+			headers: { "Content-Type": "application/json" }
+		});
+	}
+	if (!authenticateAdmin(password)) {
+		return new Response(JSON.stringify({ error: "Invalid password" }), {
+			status: 401,
+			headers: { "Content-Type": "application/json" }
+		});
+	}
+	if (!tweetId) {
+		return new Response(JSON.stringify({ error: "tweetId is not set" }), {
+			status: 400,
+			headers: { "Content-Type": "application/json" }
+		});
+	}
+	try {
+		await tweetRepository.deleteTweet(tweetId);
+		return new Response(JSON.stringify({ tweetId }), {
 			status: 200,
 			headers: { "Content-Type": "application/json" }
 		});

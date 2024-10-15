@@ -1,6 +1,7 @@
 export interface Tweet {
     id?: string;
     content: string;
+    article?: string;
     author: string;
     ip_address: string;
     created_at?: string;

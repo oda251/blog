@@ -14,19 +14,22 @@ const TweetList: React.FC<TweetListProps> = ({ state }) => {
   const windowWidth = useWindowWidth();
   const sizeMap = useRef(new Map<number, number>()); // 各アイテムの高さを保存するMap
   const listRef = useRef<List>(null);
+  const isLoading = useRef<boolean>(false);
   const loadMoreTweets = useContext(TweetContext).loadMoreTweets;
 
   const handleItemsRendered = useCallback(
-    ({ visibleStopIndex }) => {
+    async ({ visibleStopIndex }) => {
       if (
+        !isLoading.current &&
         state.tweets.length % pageSize === 0 &&
-        visibleStopIndex === state.tweets.length - 1 &&
-        state.hasMore
+        visibleStopIndex === state.tweets.length - 1
       ) {
-        if (loadMoreTweets) loadMoreTweets();
+        isLoading.current = true;
+        if (loadMoreTweets) await loadMoreTweets();
+        isLoading.current = false;
       }
     },
-    [state.tweets.length, state.hasMore, loadMoreTweets]
+    [state.tweets.length, loadMoreTweets]
   );
 
   const getItemSize = (index: number) => {

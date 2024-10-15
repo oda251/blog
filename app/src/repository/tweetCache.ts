@@ -5,7 +5,6 @@ class TweetCache {
 	private tweets: Map<string | null, TweetWithTags[]>;
 
 	constructor() {
-		this.tags = new Map();
 		this.tweets = new Map();
 	}
 
@@ -30,8 +29,9 @@ class TweetCache {
 	}
 
 	resetTweets(target: string[]): void {
-		this.tags.forEach((id, name) => {
-			if (id === null || target.includes(id)) {
+		this.tweets.delete(null);
+		this.tags.forEach((id) => {
+			if (target.includes(id)) {
 				this.tweets.delete(id);
 			}
 		});

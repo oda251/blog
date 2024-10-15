@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import TweetEditor from './TweetEditor';
 import TweetList from './TweetList';
 import axios from 'axios';
@@ -13,9 +14,8 @@ interface TweetAppProps {
 
 export interface TweetAppState {
   tweets: TweetWithTags[];
-  hasMore: boolean;
+  hasMoreOldTweets: boolean;
   tagFilter: string | null;
-  is_loading?: boolean;
   debugInfo: string;
 }
 
@@ -24,15 +24,15 @@ export class TweetApp extends React.Component<TweetAppProps, TweetAppState> {
     super(props);
     this.state = {
       tweets: props.tweets,
-      hasMore: true,
       tagFilter: null,
       debugInfo: '',
     };
   }
+  hasMore = true;
 
   loadMoreTweets = async () => {
-    if (!this.state.hasMore || this.state.is_loading) return;
-    this.setState({ is_loading: true }, async () => {
+    if (!this.hasMore) return;
+    async () => {
       const url = `/api/tweets`
         + `?oldId=${this.state.tweets[this.state.tweets.length - 1].id}`
         + (this.state.tagFilter ? `&tagId=${this.state.tagFilter}` : '')
@@ -45,13 +45,12 @@ export class TweetApp extends React.Component<TweetAppProps, TweetAppState> {
             tweets: [...this.state.tweets, ...newTweets],
           });
         } else {
-          this.setState({ hasMore: false });
+          this.hasMore = false;
         }
       } else {
-        this.setState({ hasMore: false });
+        this.hasMore = false;
       }
-      this.setState({ is_loading: false });
-    });
+    };
   }
 
   loadNewTweets = async () => {
@@ -64,10 +63,8 @@ export class TweetApp extends React.Component<TweetAppProps, TweetAppState> {
       const newTweets = await response.data;
       this.setState({
         tweets: [...newTweets, ...this.state.tweets],
-        hasMore: true,
       });
-    } else {
-      this.setState({ hasMore: false });
+    } else { 
     }
   }
 
@@ -80,10 +77,10 @@ export class TweetApp extends React.Component<TweetAppProps, TweetAppState> {
       const newTweets = await response.data;
       this.setState({
         tweets: newTweets,
-        hasMore: true,
       });
+      this.hasMore = true;
     } else {
-      this.setState({ hasMore: false });
+      this.hasMore = false;
     }
   }
 
@@ -108,6 +105,23 @@ export class TweetApp extends React.Component<TweetAppProps, TweetAppState> {
     }
   }
 
+  deleteTweet = async (tweetId: string, password: string) => {
+    const response = await axios.delete(`/api/tweets?tweetId=${tweetId}`, {
+      headers: {
+        "Content-Type": "application/json",
+        "password": password,
+      },
+    });
+    if (response.status === 200) {
+      this.setState({
+        tweets: this.state.tweets.filter((tweet) => tweet.id !== tweetId),
+      });
+    } else {
+      const error: string = await response.data.error;
+      throw new Error(error);
+    }
+  }
+
   tagSelectorOnClick = (tagId: string) => {
     this.setState({ tagFilter: this.state.tagFilter === tagId ? null : tagId }, () => {
       this.reloadTweets();
@@ -128,6 +142,7 @@ export class TweetApp extends React.Component<TweetAppProps, TweetAppState> {
       loadMoreTweets: this.loadMoreTweets,
       loadNewTweets: this.loadNewTweets,
       postTweet: this.postTweet,
+      deleteTweet: this.deleteTweet,
       tagMap: this.props.tagMap,
       convertTagIdToName: this.convertTagIdToName,
     }}>

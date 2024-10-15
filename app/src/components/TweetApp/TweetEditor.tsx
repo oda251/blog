@@ -23,7 +23,6 @@ const TweetEditor: React.FC<TweetEditorProps> = () => {
 
   const onClick = async (): Promise<void> => {
     if (isPosting) return;
-
     setIsPosting(true);
     try {
       if (!postTweet) throw new Error("postTweet is not defined");

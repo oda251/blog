@@ -3,13 +3,13 @@ import pg from 'pg';
 import moment from 'moment-timezone';
 import { validateTweet } from '../entities/validate';
 import TweetCache from './tweetCache';
+import DeleteTweetButton from '../components/TweetApp/DeleteTweetBottun';
 
 const { Client } = pg;
 
 class TweetRepository {
 	private client: InstanceType<typeof Client>;
 	private static pageSize: number = 30;
-	private tagsCache: TagMap;
 	private cache: TweetCache;
 
 	constructor() {
@@ -23,12 +23,15 @@ class TweetRepository {
 
 	async initialize() {
 		await this.client.connect();
-		this.tagsCache = await this.fetchTags();
+		this.cache.setTags(await this.fetchTags());
 	}
 
 	async fetchTweetsByOldId(oldId: string | null, tagId?: string | null): Promise<TweetWithTags[]> {
-		if (!oldId && this.cache.getTweets(tagId)) {
-			return this.cache.getTweets(tagId)!;
+		if (!oldId) {
+			const tweets = this.cache.getTweets(tagId);
+			if (tweets) {
+				return tweets;
+			}
 		}
 		let query: string;
 		let params: any[];
@@ -93,15 +96,17 @@ class TweetRepository {
     }
 
 	async fetchTags(): Promise<Map<string, string>> {
-		if (this.tagsCache) {
-			return this.tagsCache;
+		let tags: Map<string, string>;
+		tags = this.cache.getTags();
+		if (tags) {
+			return tags;
 		}
 		const query = `
 			SELECT *
 			FROM tags;
 		`;
 		const result: pg.QueryResult<Tag> = await this.client.query(query);
-		const tags = new Map<string, string>();
+		tags = new Map<string, string>();
 		for (const row of result.rows) {
 			tags.set(row.id!, row.name);
 		}
@@ -161,6 +166,32 @@ class TweetRepository {
 				`;
 				await this.client.query(query, [tweetId, tagId]);
 			}
+			await this.client.query('COMMIT');
+			this.cache.resetTweets(tweet.tag_id_list);
+		} catch (e) {
+			await this.client.query('ROLLBACK');
+			throw e;
+		}
+	}
+
+	async deleteTweet(tweetId: string) : Promise<void> {
+		const target = await this.client.query('SELECT * FROM tweets WHERE id = $1', [tweetId]) as pg.QueryResult<TweetWithTags>;
+		if (target.rows.length === 0) {
+			throw new Error('Tweet not found');
+		}
+		const tweet = target.rows[0] as TweetWithTags;
+		await this.client.query('BEGIN');
+		try {
+			const query = `
+				DELETE FROM tweets_tags
+				WHERE tweet_id = $1;
+			`;
+			await this.client.query(query, [tweetId]);
+			const query2 = `
+				DELETE FROM tweets
+				WHERE id = $1;
+			`;
+			await this.client.query(query2, [tweetId]);
 			await this.client.query('COMMIT');
 			this.cache.resetTweets(tweet.tag_id_list);
 		} catch (e) {
