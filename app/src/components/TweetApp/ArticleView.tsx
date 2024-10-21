@@ -1,18 +1,16 @@
 import React, { forwardRef, useContext } from 'react';
-import type { TweetWithTags } from '../../entities/types/Tweet';
-import TweetContext from './TweetContext';
+import type { TweetWithTags } from '../../types/Tweet';
 import Linkify from 'linkify-react';
+import { useSelector } from 'react-redux';
+import type { RootState } from './store';
 
 interface ArticleViewProps {
   readonly tweet: TweetWithTags;
   readonly className?: string;
 }
 
-interface ArticleViewState {
-}
-
 const ArticleView: React.FC<ArticleViewProps> = (props) => {
-  const convertTagIdToName = useContext(TweetContext).convertTagIdToName;
+  const tagMap = useSelector((state: RootState) => state.tag.tags);
   const tag_id_list = props.tweet.tag_id_list;
   const linkifyOptions = {
     className: 'text-blue-400 underline',
@@ -40,7 +38,7 @@ const ArticleView: React.FC<ArticleViewProps> = (props) => {
 		<div className="tweet-tags mt-2">
 		  {tag_id_list.map((tagId) => (
 			<span key={tagId} className="tag text-xs text-gray-400 bg-gray-800 px-1 py-0.5 rounded-md mr-1">
-			  {convertTagIdToName && convertTagIdToName(tagId)}
+			  { tagMap[tagId] }
 			</span>
 		  ))}
 		</div>

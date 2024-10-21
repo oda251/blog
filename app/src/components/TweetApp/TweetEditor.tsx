@@ -1,15 +1,18 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { validateTweet } from "../../entities/validate";
-import type { TweetWithTags } from "../../entities/types/Tweet";
-import TweetContext from "./TweetContext";
+import type { TweetWithTags } from "../../types/Tweet";
 import TagSelector from "./TagSelector";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "./store";
+import { postTweetAction } from "./thunk/postTweet";
 
 interface TweetEditorProps {
+  className?: string;
 }
 
-const TweetEditor: React.FC<TweetEditorProps> = () => {
+const TweetEditor: React.FC<TweetEditorProps> = ({className}) => {
   const [tweet, setTweet] = useState<TweetWithTags>({
+    id: "",
     content: "",
     author: "",
     ip_address: "",
@@ -19,34 +22,16 @@ const TweetEditor: React.FC<TweetEditorProps> = () => {
   const [isPosting, setIsPosting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [tagSelection, setTagSelection] = useState<Map<string, boolean>>(new Map());
-  const postTweet = React.useContext(TweetContext).postTweet;
+  const dispatch = useDispatch<AppDispatch>();
 
   const onClick = async (): Promise<void> => {
     if (isPosting) return;
     setIsPosting(true);
     try {
-      if (!postTweet) throw new Error("postTweet is not defined");
       validateTweet(tweet);
-      tagSelection.forEach((selected, tagId) => {
-        if (selected) {
-          tweet.tag_id_list.push(tagId);
-        }
-      });
-      setErrorMessage(null);
-      const successed = await postTweet(tweet);
-      if (successed) {
-        setTweet({
-          ...tweet,
-          author: "",
-          content: "",
-          tag_id_list: [],
-        });
-        setTagSelection(new Map());
-      } else {
-        throw new Error("Server error");
-      }
-    } catch (error: any) {
-      setErrorMessage(error.message);
+      await dispatch(postTweetAction(tweet));
+    } catch (e) {
+      setErrorMessage(e.message);
     } finally {
       setIsPosting(false);
     }
@@ -58,7 +43,7 @@ const TweetEditor: React.FC<TweetEditorProps> = () => {
   const tagSelectorIsSelected = (tagId: string): boolean => tagSelection.get(tagId) || false;
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg w-4/5 sm:w-full">
+    <div className={`max-w-md mx-auto p-6 bg-white shadow-md rounded-lg w-[95%] ${className}`}>
       <div className="mb-4">
         <label className="block text-gray-700 text-sm font-bold mb-2">Author</label>
         <input

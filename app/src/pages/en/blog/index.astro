@@ -1,7 +1,7 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro'
-import { TweetApp } from '../../components/Tweet/TweetApp'
-import tweetRepository from '../../repository/tweetRepository'
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+import TweetApp from '../../../components/TweetApp/index'
+import tweetRepository from '../../../repository/tweetRepository'
 const title = 'blog'
 
 const initTweets = await tweetRepository.fetchTweetsByOldId(null)

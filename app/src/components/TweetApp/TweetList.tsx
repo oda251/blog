@@ -1,35 +1,44 @@
-import React, { useCallback, useRef, useEffect, useContext } from "react";
+import React, { useCallback, useRef, useEffect } from "react";
 import TweetView from "./TweetView";
 import { VariableSizeList as List } from "react-window";
-import type { TweetAppState } from "./TweetApp";
 import useWindowWidth from "../../utils/useWindowWidth";
-import TweetContext from "./TweetContext";
+import { useDispatch, useSelector } from "react-redux";
+import type { AppDispatch, RootState } from "./store";
+import { loadOlderTweetsAction } from "./thunk/loadTweet";
 
 interface TweetListProps {
-  state: TweetAppState;
+  className?: string;
 }
 
-const TweetList: React.FC<TweetListProps> = ({ state }) => {
+const TweetList: React.FC<TweetListProps> = ({className}) => {
   const pageSize = 30;
   const windowWidth = useWindowWidth();
+  const tweets = useSelector((state: RootState) => state.tweet.tweets);
   const sizeMap = useRef(new Map<number, number>()); // 各アイテムの高さを保存するMap
   const listRef = useRef<List>(null);
+  const hasMoreOldTweets = useRef<boolean>(true);
   const isLoading = useRef<boolean>(false);
-  const loadMoreTweets = useContext(TweetContext).loadMoreTweets;
+  const dispatch = useDispatch<AppDispatch>();
 
   const handleItemsRendered = useCallback(
     async ({ visibleStopIndex }) => {
       if (
         !isLoading.current &&
-        state.tweets.length % pageSize === 0 &&
-        visibleStopIndex === state.tweets.length - 1
+        hasMoreOldTweets.current &&
+        tweets.length % pageSize === 0 &&
+        visibleStopIndex === tweets.length - 1
       ) {
         isLoading.current = true;
-        if (loadMoreTweets) await loadMoreTweets();
+        const updated = await dispatch(loadOlderTweetsAction(tweets[tweets.length - 1].id));
+        if (loadOlderTweetsAction.fulfilled.match(updated)) {
+          hasMoreOldTweets.current = updated.payload;
+        } else if (loadOlderTweetsAction.rejected.match(updated)) {
+          hasMoreOldTweets.current = false;
+        }
         isLoading.current = false;
       }
     },
-    [state.tweets.length, loadMoreTweets]
+    []
   );
 
   const getItemSize = (index: number) => {
@@ -59,8 +68,8 @@ const TweetList: React.FC<TweetListProps> = ({ state }) => {
       <div style={style}>
         <TweetView
           ref={ref}
-          tweet={state.tweets[index]}
-          key={state.tweets[index].id}
+          tweet={tweets[index]}
+          key={tweets[index].id}
           className="border-b border-slate-500"
         />
       </div>
@@ -68,11 +77,11 @@ const TweetList: React.FC<TweetListProps> = ({ state }) => {
   };
 
   return (
-    <div className="w-full flex flex-col items-center justify-center pb-1">
+    <div className={`w-full flex flex-col items-center justify-center pb-1 ${className}`}>
       <List
         ref={listRef}
         height={700}
-        itemCount={state.tweets.length}
+        itemCount={tweets.length}
         itemSize={getItemSize}
         width="100%"
         onItemsRendered={handleItemsRendered}
@@ -80,7 +89,6 @@ const TweetList: React.FC<TweetListProps> = ({ state }) => {
       >
         {Row}
       </List>
-      <p className="mt-4 text-sm text-gray-500">{state.debugInfo}</p>
     </div>
   );
 };

@@ -1,32 +1,33 @@
 import React from "react";
-import TweetContext from "./TweetContext";
+import { useSelector } from "react-redux";
+import type { RootState } from "./store";
 
 interface TagSelectorProps {
-  isSelected: (tagId: string) => boolean;
-  onClick: (tagId: string) => void;
   className?: string;
   classNameSelected?: string;
   classNameUnselected?: string;
+  isSelected: (tagId: string) => boolean;
+  onClick: (tagId: string) => void;
 }
 
 const TagSelector: React.FC<TagSelectorProps> = ({ isSelected, onClick, className, classNameSelected, classNameUnselected }) => {
-  const tagMap = React.useContext(TweetContext).tagMap!;
+	const tagMap = useSelector((state: RootState) => state.tag.tags);
+  
+	return (
+	  <div className="flex flex-wrap">
+		  {Object.entries(tagMap).map(([tagId, tagName]) => (
+		  <button
+			  key={tagId}
+			  className={`${className}  ${
+			  isSelected(tagId) ? classNameSelected : classNameUnselected
+			  }`}
+			  onClick={() => onClick(tagId)}
+		  >
+			  {tagName}
+		  </button>
+		  ))}
+	  </div>
+	);
+  };
 
-  return (
-	<div className="flex flex-wrap">
-		{Array.from(tagMap.entries()).map(([tagId, tagName]) => (
-		<button
-			key={tagId}
-			className={`${className}  ${
-			isSelected(tagId) ? classNameSelected : classNameUnselected
-			}`}
-			onClick={() => onClick(tagId)}
-		>
-			{tagName}
-		</button>
-		))}
-	</div>
-  );
-};
-
-export default TagSelector;
+  export default TagSelector;

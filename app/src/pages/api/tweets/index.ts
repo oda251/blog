@@ -1,6 +1,6 @@
 import type { APIRoute } from "astro";
 import tweetRepository from "../../../repository/tweetRepository";
-import type { TweetWithTags } from "../../../entities/types/Tweet";
+import type { TweetWithTags } from "../../../types/Tweet";
 import { validateTweet } from "../../../entities/validate";
 import { authenticateAdmin } from "../../../entities/auth";
 

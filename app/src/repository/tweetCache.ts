@@ -1,10 +1,11 @@
-import type { TagMap, TweetWithTags } from "../entities/types/Tweet";
+import type { TagMap, TweetWithTags } from "../types/Tweet";
 
 class TweetCache {
 	private tags: TagMap;
 	private tweets: Map<string | null, TweetWithTags[]>;
 
 	constructor() {
+		this.tags = {};
 		this.tweets = new Map();
 	}
 
@@ -30,7 +31,10 @@ class TweetCache {
 
 	resetTweets(target: string[]): void {
 		this.tweets.delete(null);
-		this.tags.forEach((id) => {
+		if (!target || target.length === 0) {
+			return;
+		}
+		Object.entries(this.tags).forEach(([id, _]) => {
 			if (target.includes(id)) {
 				this.tweets.delete(id);
 			}

@@ -1,38 +1,22 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { deleteTweet } from '../repository/deleteTweet';
+import { removeTweet } from '../slice/tweets';
+import type { Result } from '../../../types/Result';
 
 export interface DeleteTweetPayload {
   tweetId: string;
   password: string;
 }
-interface DeleteTweetResult {
-}
 
-export const deleteTweet = createAsyncThunk<DeleteTweetResult, DeleteTweetPayload>(
+export const deleteTweetAction = createAsyncThunk<Result<void>, DeleteTweetPayload>(
   'tweets/delete',
-  async ({tweetId, password}, {rejectWithValue}) => {
-    const url = `/api/tweets?tweetId=${tweetId}`;
-    return axios.delete(url, { headers: { password } })
-      .then()
-      .catch(error => {
-        if (axios.isAxiosError(error)) {
-          if (error.response) {
-            return rejectWithValue({
-              status: error.response?.status,
-              error: error.response?.data,
-            });
-          } else {
-            return rejectWithValue({
-              status: -1,
-              error: error.message,
-            });
-          }
-        } else {
-          return rejectWithValue({
-            status: -1,
-            error: error.message,
-          });
-        }
-      });
+  async ({tweetId, password}, {rejectWithValue, dispatch}) => {
+    const result = await deleteTweet(tweetId, password);
+    if (result.status === 200) {
+      dispatch(removeTweet(tweetId));
+      return result;
+    } else {
+      return rejectWithValue(result.error);
+    }
   }
 );

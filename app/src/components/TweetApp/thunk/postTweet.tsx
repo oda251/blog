@@ -1,37 +1,23 @@
-import { createAsyncThunk, isRejectedWithValue } from '@reduxjs/toolkit';
-import type { TweetWithTags } from '../../../entities/types/Tweet';
-import axios from 'axios';
+import { createAsyncThunk } from '@reduxjs/toolkit';
+import type { TweetWithTags } from '../../../types/Tweet';
+import type { TweetSliceState } from '../slice/tweets';
+import { postTweet } from '../repository/postTweet';
+import { applyTagFilterAction } from './setTagFilter';
+import { reloadTweetsAction } from './loadTweet';
 
-export interface PostTweetPayload {
-	  tweet: TweetWithTags;
-}
-export interface PostTweetResult {
-}
-
-export const postTweet = createAsyncThunk<PostTweetResult, PostTweetPayload>(
+export const postTweetAction = createAsyncThunk<void, TweetWithTags>(
 	'tweets/post',
-	async ({ tweet }, { rejectWithValue }) => {
-		return axios.post('/api/tweets', tweet)
-			.then()
-			.catch(error => {
-				if (axios.isAxiosError(error)) {
-					if (error.response) {
-						return rejectWithValue({
-							status: error.response?.status,
-							error: error.response?.data,
-						});
-					} else {
-						return rejectWithValue({
-							status: -1,
-							error: error.message,
-						});
-					}
-				} else {
-					return rejectWithValue({
-						status: -1,
-						error: error.message,
-					});
-				}
-			});
+	async (tweet, { rejectWithValue, getState, dispatch }) => {
+		const result = await postTweet(tweet);
+		if (result.status !== 200) {
+			return rejectWithValue(result);
+		}
+		const state = getState() as TweetSliceState;
+		let tagFilter = state.tagFilter;
+		if (tagFilter !== null && !tweet.tag_id_list.includes(tagFilter)) {
+			await dispatch(applyTagFilterAction(null));
+		} else {
+			await dispatch(reloadTweetsAction());
+		}
 	}
 );

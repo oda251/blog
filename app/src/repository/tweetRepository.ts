@@ -1,9 +1,8 @@
-import type { Tag, TagMap, TweetWithTags } from '../entities/types/Tweet';
+import type { Tag, TagMap, TweetWithTags } from '../types/Tweet';
 import pg from 'pg';
 import moment from 'moment-timezone';
 import { validateTweet } from '../entities/validate';
 import TweetCache from './tweetCache';
-import DeleteTweetButton from '../components/TweetApp/DeleteTweetBottun';
 
 const { Client } = pg;
 
@@ -24,6 +23,26 @@ class TweetRepository {
 	async initialize() {
 		await this.client.connect();
 		this.cache.setTags(await this.fetchTags());
+	}
+
+	async fetchTweetById(tweetId: string): Promise<TweetWithTags> {
+		const query = `
+			SELECT t.*, array_agg(tt.tag_id) as tag_id_list
+			FROM tweets t
+			LEFT JOIN tweets_tags tt ON t.id = tt.tweet_id
+			WHERE t.id = $1
+			GROUP BY t.id;
+		`;
+		const result: pg.QueryResult<TweetWithTags> = await this.client.query(query, [tweetId]);
+		const row = result.rows[0];
+		if (!row) {
+			throw new Error('Tweet not found');
+		}
+		return {
+			...row,
+			created_at: moment(row.created_at).tz('Asia/Tokyo').format('YYYY-MM-DD HH:mm:ss'),
+			tag_id_list: row.tag_id_list[0] ? row.tag_id_list : []
+		};
 	}
 
 	async fetchTweetsByOldId(oldId: string | null, tagId?: string | null): Promise<TweetWithTags[]> {
@@ -87,7 +106,7 @@ class TweetRepository {
         const tweets = result.rows.map((row: any) => ({
             ...row,
             created_at: moment(row.created_at).tz('Asia/Tokyo').format('YYYY-MM-DD HH:mm:ss'),
-			tag_id_list: row.tag_id_list[0] ? row.tag_id_list : []
+						tag_id_list: row.tag_id_list[0] ? row.tag_id_list : []
         })) as TweetWithTags[];
 		if (!oldId) {
 			this.cache.setTweets(tagId, tweets);
@@ -95,10 +114,10 @@ class TweetRepository {
 		return tweets;
     }
 
-	async fetchTags(): Promise<Map<string, string>> {
-		let tags: Map<string, string>;
+	async fetchTags(): Promise<TagMap> {
+		let tags: TagMap;
 		tags = this.cache.getTags();
-		if (tags) {
+		if (Object.keys(tags).length > 0) {
 			return tags;
 		}
 		const query = `
@@ -106,9 +125,8 @@ class TweetRepository {
 			FROM tags;
 		`;
 		const result: pg.QueryResult<Tag> = await this.client.query(query);
-		tags = new Map<string, string>();
 		for (const row of result.rows) {
-			tags.set(row.id!, row.name);
+			tags[row.id] = row.name;
 		}
 		return tags;
 	}
@@ -148,9 +166,9 @@ class TweetRepository {
 	}
 
 	async postTweet(tweet: TweetWithTags) : Promise<void> {
-		validateTweet(tweet);
-		await this.client.query('BEGIN');
 		try {
+			validateTweet(tweet);
+			await this.client.query('BEGIN');
 			const query = `
 				INSERT INTO tweets (content, author, ip_address)
 				VALUES ($1, $2, $3)
@@ -158,7 +176,6 @@ class TweetRepository {
 			`;
 			const result = await this.client.query(query, [tweet.content, tweet.author, tweet.ip_address]);
 			const tweetId = result.rows[0].id;
-
 			for (const tagId of tweet.tag_id_list) {
 				const query = `
 					INSERT INTO tweets_tags (tweet_id, tag_id)
@@ -175,22 +192,18 @@ class TweetRepository {
 	}
 
 	async deleteTweet(tweetId: string) : Promise<void> {
-		const target = await this.client.query('SELECT * FROM tweets WHERE id = $1', [tweetId]) as pg.QueryResult<TweetWithTags>;
-		if (target.rows.length === 0) {
-			throw new Error('Tweet not found');
-		}
-		const tweet = target.rows[0] as TweetWithTags;
-		await this.client.query('BEGIN');
 		try {
+			const tweet = await this.fetchTweetById(tweetId);
 			const query = `
 				DELETE FROM tweets_tags
 				WHERE tweet_id = $1;
 			`;
-			await this.client.query(query, [tweetId]);
 			const query2 = `
 				DELETE FROM tweets
 				WHERE id = $1;
 			`;
+			await this.client.query('BEGIN');
+			await this.client.query(query, [tweetId]);
 			await this.client.query(query2, [tweetId]);
 			await this.client.query('COMMIT');
 			this.cache.resetTweets(tweet.tag_id_list);

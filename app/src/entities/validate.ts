@@ -1,4 +1,4 @@
-import type { TweetWithTags } from "./types/Tweet";
+import type { TweetWithTags } from "../types/Tweet";
 
 export function validateTweet(tweet: TweetWithTags | null) {
 	if (!tweet) {

@@ -1,21 +1,24 @@
-import type { TagMap, TweetWithTags } from '../../../entities/types/Tweet';
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { FetchTweetsResult, loadNewerTweets, loadOlderTweets, reloadTweets } from '../thunk/fetchTweet';
-import { postTweet, PostTweetResult } from '../thunk/postTweet';
+import type { TweetWithTags } from '../../../types/Tweet';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
+import { loadOlderTweetsAction, loadNewerTweetsAction, reloadTweetsAction } from '../thunk/loadTweet';
+import { postTweetAction } from '../thunk/postTweet';
+import { deleteTweetAction } from '../thunk/deleteTweet';
+import { applyTagFilterAction } from '../thunk/setTagFilter';
 
-interface TweetSliceState {
+export interface TweetSliceState {
+	isLoading: boolean;
 	tweets: TweetWithTags[];
 	hasMoreOldTweets: boolean;
-	tags: TagMap;
 	tagFilter: string | null;
 	errorMessage: string | null;
 	debugInfo: string;
 }
 
 const initialState: TweetSliceState = {
+	isLoading: false,
 	tweets: [],
 	hasMoreOldTweets: true,
-	tags: new Map<string, string>(),
 	tagFilter: null,
 	errorMessage: null,
 	debugInfo: '',
@@ -25,38 +28,106 @@ const tweetsSlice = createSlice({
 	name: 'tweets',
 	initialState: initialState,
 	reducers: {
+		removeTweet: (state: TweetSliceState, action: PayloadAction<string>) => {
+			state.tweets = state.tweets.filter(tweet => tweet.id !== action.payload);
+		},
 		setTweets: (state: TweetSliceState, action: PayloadAction<TweetWithTags[]>) => {
 			state.tweets = action.payload;
 			state.hasMoreOldTweets = true;
-		}
+		},
+		pbTweets: (state: TweetSliceState, action: PayloadAction<TweetWithTags[]>) => {
+			state.tweets = [...state.tweets, ...action.payload];
+			state.hasMoreOldTweets = true;
+		},
+		pfTweets: (state: TweetSliceState, action: PayloadAction<TweetWithTags[]>) => {
+			state.tweets = [...action.payload, ...state.tweets];
+			state.hasMoreOldTweets = true;
+		},
+		setTagFilter: (state: TweetSliceState, action: PayloadAction<string | null>) => {
+			state.tagFilter = action.payload;
+		},
 	},
 	extraReducers: builder => {
-		builder.addCase(loadOlderTweets.fulfilled.type, (state: TweetSliceState, action: PayloadAction<FetchTweetsResult>) => {
-			if (!action.payload.tweets || action.payload.tweets.length === 0) {
-				state.hasMoreOldTweets = false;
-			} else {
-				state.tweets = [...state.tweets, ...action.payload.tweets];
+		builder.addCase(loadOlderTweetsAction.pending, (state, action) => {
+			state.isLoading = true;
+		});
+		builder.addCase(loadOlderTweetsAction.fulfilled, (state, action) => {
+			state.isLoading = false;
+		});
+		builder.addCase(loadOlderTweetsAction.rejected, (state, action) => {
+			const value = action.payload;
+			if (value) {
+				console.log(value);
 			}
+			state.isLoading = false;
 		});
-		builder.addCase(loadOlderTweets.rejected.type, (state: TweetSliceState, action: PayloadAction<any>) => {
-			state.hasMoreOldTweets = false;
+		builder.addCase(loadNewerTweetsAction.pending, (state, action) => {
+			state.isLoading = true;
 		});
-		builder.addCase(loadNewerTweets.fulfilled.type, (state: TweetSliceState, action: PayloadAction<FetchTweetsResult>) => {
-			if (action.payload.tweets && action.payload.tweets.length > 0) {
-				state.tweets = [...action.payload.tweets, ...state.tweets];
+		builder.addCase(loadNewerTweetsAction.fulfilled, (state, action) => {
+			state.isLoading = false;
+		});
+		builder.addCase(loadNewerTweetsAction.rejected, (state, action) => {
+			const value = action.payload;
+			if (value) {
+				console.log(value);
 			}
+			state.isLoading = false;
 		});
-		builder.addCase(loadNewerTweets.rejected.type, (state: TweetSliceState, action: PayloadAction<any>) => {
+		builder.addCase(reloadTweetsAction.pending, (state, action) => {
+			state.isLoading = true;
 		});
-		builder.addCase(reloadTweets.fulfilled.type, (state: TweetSliceState, action: PayloadAction<FetchTweetsResult>) => {
-			if (action.payload.tweets) {
-				state.tweets = action.payload.tweets;
+		builder.addCase(reloadTweetsAction.fulfilled, (state, action) => {
+			state.isLoading = false;
+		});
+		builder.addCase(reloadTweetsAction.rejected, (state, action) => {
+			const value = action.payload;
+			if (value) {
+				console.log(value);
 			}
+			state.isLoading = false;
 		});
-		builder.addCase(reloadTweets.rejected.type, (state: TweetSliceState, action: PayloadAction<any>) => {
+		builder.addCase(postTweetAction.pending, (state, action) => {
+			state.isLoading = true;
 		});
-		builder.addCase(postTweet.fulfilled.type, (state: TweetSliceState, action: PayloadAction<PostTweetResult>) => {
-			
+		builder.addCase(postTweetAction.fulfilled, (state, action) => {
+			state.isLoading = false;
+		});
+		builder.addCase(postTweetAction.rejected, (state, action) => {
+			const value = action.payload;
+			if (value) {
+				console.log(value);
+			}
+			state.isLoading = false;
+		});
+		builder.addCase(deleteTweetAction.pending, (state, action) => {
+			state.isLoading = true;
+		});
+		builder.addCase(deleteTweetAction.fulfilled, (state, action) => {
+			state.isLoading = false;
+		});
+		builder.addCase(deleteTweetAction.rejected, (state, action) => {
+			const value = action.payload;
+			if (value) {
+				console.log(value);
+			}
+			state.isLoading = false;
+		});
+		builder.addCase(applyTagFilterAction.pending, (state, action) => {
+			state.isLoading = true;
+		});
+		builder.addCase(applyTagFilterAction.fulfilled, (state, action) => {
+			state.isLoading = false;
+		});
+		builder.addCase(applyTagFilterAction.rejected, (state, action) => {
+			const value = action.payload;
+			if (value) {
+				console.log(value);
+			}
+			state.isLoading = false;
 		});
 	}
 })
+
+export const { removeTweet, setTweets, pbTweets, pfTweets, setTagFilter } = tweetsSlice.actions;
+export const TweetReducer = tweetsSlice.reducer;
