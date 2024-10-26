@@ -1,6 +1,7 @@
 ---
 import Twitter from '../links/Twitter.astro';
 import GitHub from '../links/GitHub.astro';
+import Qiita from '../links/Qiita.astro';
 const { class: className, style: styleName } = Astro.props
 class LocaledString {[locale: string]: string};
 const name: string = "yoda";
@@ -42,6 +43,10 @@ const header: {[key: string]: LocaledString} = {
   month: {
     "jp": "月",
     "en": "month"
+  },
+  links: {
+    "jp": "",
+    "en": ""
   },
   belong: {
     "jp": "所属",
@@ -170,17 +175,30 @@ const locale = Astro.currentLocale ? Astro.currentLocale : "en";
         <td style="text-align:right">{updatedAt.getString(locale)}</td>
       </tr>
       <tr style={rowHeight}>
+        <td class="bd-t-s bd-r-s bd-l-s center" colspan="6">{header.links[locale]}</td>
+      </tr>
+      <tr style={rowHeight}>
         <td class="bd-t-s bd-l-s">
-          <Twitter showIcon="True"/>
+          <Twitter showIcon="True" class="text-[14px]"/>
         </td>
-        <td class="bd-t-s" colspan="2">
+        <td class="bd-t-s bd-r-s" colspan="6">
           <Twitter class="text-blue-600" showId="True">
         </td>
-        <td class="bd-t-s bd-l-s">
-          <GitHub showIcon="True"/>
+      </tr>
+      <tr style={rowHeight}>
+        <td class="bd-l-s">
+          <GitHub showIcon="True" class="text-[14px]"/>
         </td>
-        <td class="bd-t-s bd-r-s" colspan="2">
+        <td class="bd-r-s" colspan="6">
           <GitHub class="text-blue-600" showId="True"/>
+        </td>
+      </tr>
+      <tr style={rowHeight}>
+        <td class="bd-l-s">
+          <Qiita showIcon="True"/>
+        </td>
+        <td class="bd-r-s" colspan="6">
+          <Qiita class="text-blue-600" showId="True">
         </td>
       </tr>
       <tr style={rowHeight}>
@@ -254,11 +272,10 @@ const locale = Astro.currentLocale ? Astro.currentLocale : "en";
         <td class="bd-t-s bd-r-s bd-l-dt" colspan="4"></td>
       </tr>
       <tr style={rowHeight}>
-        <td class="bd-t-s bd-r-s bd-l-s" colspan="6">{header.anythingelse[locale]}</td>
+        <td class="bd-t-s bd-r-s bd-l-s center" colspan="6">{header.anythingelse[locale]}</td>
       </tr>
       <tr style={rowHeight}>
         <td class="bd-t-s bd-r-s bd-b-s bd-l-s" colspan="6" rowspan="3">
-          <a class="text-blue-600" href="https://qiita.com/konpeito_morimori">qiita</a>
         </td>
       </tr>
       <tr style={rowHeight}>

@@ -1,0 +1,12 @@
+---
+import { Image } from 'astro:assets'
+import qiitaIcon from "../../assets/qiita-icon.png"
+const { class: className, showIcon, showId } = Astro.props
+const username = "suggoi_kani"
+const url = `https://qiita.com/${username}`
+---
+
+<a class=`flex ${className}` href={url}>
+	{showIcon && <Image src={qiitaIcon} width="14" alt="Qiita" />}
+	{showId && <span>{username}</span>}
+</a>

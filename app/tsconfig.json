@@ -6,6 +6,6 @@
 		"jsx": "react-jsx",
 	},
 	"include": [
-		"src/types/*.d.ts", "src/types/Result.d.ts",
+		"src/types/*.d.ts",
 	]
 }
