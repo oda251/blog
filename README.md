@@ -1,3 +1,7 @@
+## 概要
+- 私用Webアプリ
+- Twitterライクなブログ機能
+- 随時機能追加します
 ## 使用技術
 - 主なフレームワーク・ライブラリ
   - Astro
@@ -15,7 +19,7 @@
 ├── app/                             // Astroアプリ
 │   └── src/
 │       ├── components/
-│       │   ├── TweetApp/            // TwitterライクなReactアプリを分離/
+│       │   ├── TweetApp/            // TwitterライクなReactアプリを分離
 │       │   │   ├── repository/      // クライアントからサーバへのDB操作要求
 │       │   │   ├── slice/
 │       │   │   ├── store/
