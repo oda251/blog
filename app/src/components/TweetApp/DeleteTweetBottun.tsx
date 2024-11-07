@@ -29,6 +29,18 @@ const DeleteTweetButton: React.FC<TagSelectorProps> = ({ tweetId, className }) =
 	}
   };
 
+  const reset = () => {
+	setIsClicked(false);
+	setPassword("");
+  };
+  
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+    if (e.key === "Enter") {
+      handleDelete();
+      reset();
+    }
+  }
+
   return (
     <div className={`flex ${className}`}>
 	  {error.length > 0 && <p className="text-red-600 text-xs mr-2">{error}</p>}
@@ -40,12 +52,12 @@ const DeleteTweetButton: React.FC<TagSelectorProps> = ({ tweetId, className }) =
 				value={password}
 				onChange={(e) => setPassword(e.target.value)}
 				className="border rounded px-2 py-1 w-24"
+				onKeyDown={handleKeyDown}
 			/>
 			<button
 				onClick={() => {
 					handleDelete();
-					setIsClicked(false);
-					setPassword("");
+					reset();
 				}}
 				className="px-1"
 			>
@@ -53,8 +65,7 @@ const DeleteTweetButton: React.FC<TagSelectorProps> = ({ tweetId, className }) =
 			</button>
 			<button
 				onClick={() => {
-					setIsClicked(false);
-					setPassword("");
+					reset();
 				}}
 			>
 				<i className="fa-solid fa-times text-red-600"></i>

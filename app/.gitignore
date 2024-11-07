@@ -1,3 +1,5 @@
 .*
 !.gitignore
+!.env.example
+!.yarnrc.yml
 node_modules

@@ -30,6 +30,15 @@ const TweetEditor: React.FC<TweetEditorProps> = ({className}) => {
     try {
       validateTweet(tweet);
       await dispatch(postTweetAction(tweet));
+      setTweet({
+        id: "",
+        content: "",
+        author: "",
+        ip_address: "",
+        created_at: "",
+        tag_id_list: [],
+      });
+      setTagSelection(new Map());
     } catch (e) {
       setErrorMessage(e.message);
     } finally {
@@ -39,6 +48,12 @@ const TweetEditor: React.FC<TweetEditorProps> = ({className}) => {
 
   const toggleTagSelection = (tagId: string): void => {
     setTagSelection(new Map(tagSelection.set(tagId, !tagSelection.get(tagId))));
+    setTweet({
+      ...tweet,
+      tag_id_list: Array.from(tagSelection.entries())
+        .filter(([, isSelected]) => isSelected)
+        .map(([tagId]) => tagId),
+    });
   };
   const tagSelectorIsSelected = (tagId: string): boolean => tagSelection.get(tagId) || false;
 
