@@ -47,12 +47,16 @@ const TweetEditor: React.FC<TweetEditorProps> = ({className}) => {
   };
 
   const toggleTagSelection = (tagId: string): void => {
-    setTagSelection(new Map(tagSelection.set(tagId, !tagSelection.get(tagId))));
-    setTweet({
-      ...tweet,
-      tag_id_list: Array.from(tagSelection.entries())
-        .filter(([, isSelected]) => isSelected)
-        .map(([tagId]) => tagId),
+    setTagSelection(prev => {
+      const newSelection = new Map(prev);
+      newSelection.set(tagId, !prev.get(tagId));
+      setTweet(tw => ({
+        ...tw,
+        tag_id_list: Array.from(newSelection.entries())
+          .filter(([, isSelected]) => isSelected)
+          .map(([id]) => id),
+      }));
+      return newSelection;
     });
   };
   const tagSelectorIsSelected = (tagId: string): boolean => tagSelection.get(tagId) || false;
