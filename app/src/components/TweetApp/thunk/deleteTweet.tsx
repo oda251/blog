@@ -8,9 +8,12 @@ export interface DeleteTweetPayload {
   password: string;
 }
 
-export const deleteTweetAction = createAsyncThunk<Result<void>, DeleteTweetPayload>(
+export const deleteTweetAction = createAsyncThunk<
+  Result<void>,
+  DeleteTweetPayload
+>(
   'tweets/delete',
-  async ({tweetId, password}, {rejectWithValue, dispatch}) => {
+  async ({ tweetId, password }, { rejectWithValue, dispatch }) => {
     const result = await deleteTweet(tweetId, password);
     if (result.status === 200) {
       dispatch(removeTweet(tweetId));

@@ -10,7 +10,7 @@ import { setTweets } from './slice/tweets';
 import { setTags } from './slice/tags';
 
 export interface TweetAppProps {
-	tweets: TweetWithTags[];
+  tweets: TweetWithTags[];
   readonly tagMap: TagMap;
 }
 
@@ -19,10 +19,9 @@ const TweetApp: React.FC<TweetAppProps> = ({ tweets, tagMap }) => {
   useEffect(() => {
     dispatch(setTweets(tweets));
     dispatch(setTags(tagMap));
-  }, [dispatch, tweets, tagMap]
-  );
+  }, [dispatch, tweets, tagMap]);
   return (
-    <div className='max-w-xl w-full px-6 mx-auto flex flex-col items-center'>
+    <div className="max-w-xl w-full px-6 mx-auto flex flex-col items-center">
       <TagFilterSelector />
       <TweetList className="border-t border-slate-500" />
       <TweetEditor className="mt-1" />

@@ -1,13 +1,13 @@
 interface LangString {
-	ja: string;
-	en: string;
+  ja: string;
+  en: string;
 }
 
 interface IconString {
-	icon: string;
-	text: string;
+  icon: string;
+  text: string;
 }
 
 type IconStrings = {
-	[key: string]: IconString;
-}
+  [key: string]: IconString;
+};

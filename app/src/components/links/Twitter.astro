@@ -1,11 +1,11 @@
 ---
-const { class: className, showIcon, showId } = Astro.props
-const username = "suggoi_kani"
-const url = `https://twitter.com/${username}`
-const icon="fa-x-twitter"
+const { class: className, showIcon, showId } = Astro.props;
+const username = 'suggoi_kani';
+const url = `https://twitter.com/${username}`;
+const icon = 'fa-x-twitter';
 ---
 
 <a class={className} href={url}>
-	{showIcon && <i class=`fa-brands ${icon}`></i>}
-	{showId && <span>@{username}</span>}
+  {showIcon && <i class={`fa-brands ${icon}`} />}
+  {showId && <span>@{username}</span>}
 </a>

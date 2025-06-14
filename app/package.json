@@ -10,8 +10,8 @@
     "astro": "astro",
     "deploy": "astro build && wrangler pages deploy ./dist",
     "build-cf-types": "wrangler types",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx,.astro",
-    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx,.astro --fix",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
