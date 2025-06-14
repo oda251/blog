@@ -1,38 +1,39 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro'
-import Greeting from '../../components/Greeting.astro'
-const title = "Home"
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Greeting from '../../components/Greeting.astro';
+const title = 'Home';
 const locale = Astro.currentLocale ? Astro.currentLocale : 'en';
 ---
-<BaseLayout title={ title }>
-	<div class="w-full flex flex-col items-center justify-center">
-		<Greeting />
-		<br/>
-		<p id="message" class="typing-animation">
-			My profile is <a href=`/${locale}/aboutme` class="text-blue-300">here</a>.
-		</p>
-	</div>
+
+<BaseLayout title={title}>
+  <div class="w-full flex flex-col items-center justify-center">
+    <Greeting />
+    <br />
+    <p id="message" class="typing-animation">
+      My profile is <a href=`/${locale}/aboutme` class="text-blue-300">here</a>.
+    </p>
+  </div>
 </BaseLayout>
 
 <style>
-	.typing-animation {
-		width: 0ch;
-		border-right: 3px solid #ffffff;	/*点滅バー*/
-		overflow: hidden;	/*必須*/
-		white-space: nowrap;	/*必須*/
-		line-height:1.4;
-		@apply animate-typing;
-	}
+  .typing-animation {
+    width: 0ch;
+    border-right: 3px solid #ffffff; /*点滅バー*/
+    overflow: hidden; /*必須*/
+    white-space: nowrap; /*必須*/
+    line-height: 1.4;
+    @apply animate-typing;
+  }
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const element = document.getElementById('message');
-        if (element) {
-			const textContent = element.textContent;
-			if (!textContent) return;
-            const textLength = textContent.length - 5;
-            element.style.width = `${textLength}ch`;
-        }
-    });
+  document.addEventListener('DOMContentLoaded', () => {
+    const element = document.getElementById('message');
+    if (element) {
+      const textContent = element.textContent;
+      if (!textContent) return;
+      const textLength = textContent.length - 5;
+      element.style.width = `${textLength}ch`;
+    }
+  });
 </script>
