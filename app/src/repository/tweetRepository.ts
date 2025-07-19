@@ -13,6 +13,7 @@ class TweetRepository {
 
   constructor() {
     const url = process.env.DATABASE_URL;
+    console.log('DATABASE_URL:', url);
     if (!url) {
       throw new Error('DATABASE_URL is not set');
     }
@@ -21,8 +22,13 @@ class TweetRepository {
   }
 
   async initialize() {
-    await this.client.connect();
-    this.cache.setTags(await this.fetchTags());
+    try {
+      console.log('Initializing TweetRepository...');
+      await this.client.connect();
+      this.cache.setTags(await this.fetchTags());
+    } catch (error) {
+      console.error('Error initializing TweetRepository:', error);
+    }
   }
 
   async fetchTweetById(tweetId: string): Promise<TweetWithTags> {
@@ -124,6 +130,7 @@ class TweetRepository {
     if (!oldId) {
       this.cache.setTweets(tagId, tweets);
     }
+
     return tweets;
   }
 

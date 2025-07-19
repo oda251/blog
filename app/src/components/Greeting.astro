@@ -1,35 +1,66 @@
 ---
-import { DateTime } from 'luxon';
-
-let message: string, icon: string, style: string;
-const time = DateTime.now().setZone('Asia/Tokyo').hour;
-if (time < 5) {
-  message = 'Good night';
-  icon = 'fa-bed';
-  style = '--start-color: indigo; --end-color: lightseagreen;';
-} else if (5 < time && time < 12) {
-  message = 'good morning';
-  icon = 'fa-person-falling';
-  style = '--start-color: lightseagreen; --end-color: lemonchiffon;';
-} else if (time < 18) {
-  message = 'good afternoon';
-  icon = 'fa-running';
-  style = '--start-color: lemonchiffon; --end-color: orange;';
-} else {
-  message = 'Good evening';
-  icon = 'fa-person-drowning';
-  style = '--start-color: orange; --end-color: indigo;';
-}
+// Default values, will be replaced by client-side script
+let message: string = '';
+let icon: string = '';
+let style: string = '--start-color: lightseagreen; --end-color: lemonchiffon;';
 ---
 
-<div id="greeting" class="py-4">
+<div id="greeting" class="py-4" style="perspective: 1000px;">
   <h1
-    class=`fa-solid ${ icon } gradient font-bold animate-focus-in-expand-fwd text-4xl lg:text-6xl xl:text-8xl`
+    id="greeting-text"
+    class=`fa-solid ${icon} gradient font-bold text-4xl lg:text-6xl xl:text-8xl`
     style={style}
   >
     {message}
   </h1>
 </div>
+
+<script>
+  import { gsap } from "gsap";
+
+  const greetingText = document.getElementById('greeting-text');
+  if (greetingText) {
+    const time = new Date().getHours();
+    let message: string, icon: string, style: string;
+
+    if (time < 5) {
+      message = 'Good night';
+      icon = 'fa-bed';
+      style = '--start-color: indigo; --end-color: lightseagreen;';
+    } else if (time >= 5 && time < 12) {
+      message = 'good morning';
+      icon = 'fa-person-falling';
+      style = '--start-color: lightseagreen; --end-color: lemonchiffon;';
+    } else if (time >= 12 && time < 18) {
+      message = 'good afternoon';
+      icon = 'fa-running';
+      style = '--start-color: lemonchiffon; --end-color: orange;';
+    } else {
+      message = 'Good evening';
+      icon = 'fa-person-drowning';
+      style = '--start-color: orange; --end-color: indigo;';
+    }
+
+    greetingText.textContent = message;
+    
+    const currentIcon = greetingText.className.split(' ').find(cls => cls.startsWith('fa-') && cls !== 'fa-solid');
+    if(currentIcon) {
+        greetingText.classList.remove(currentIcon);
+    }
+    greetingText.classList.add(icon);
+    greetingText.setAttribute('style', style);
+
+    // GSAP Animation
+    gsap.from(greetingText, {
+      duration: 0.8,
+      ease: "cubic-bezier(0.250, 0.460, 0.450, 0.940)",
+      letterSpacing: "-0.5em",
+      z: -800,
+      filter: "blur(12px)",
+      opacity: 0,
+    });
+  }
+</script>
 
 <style>
   .gradient {

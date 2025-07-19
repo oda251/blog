@@ -11,6 +11,7 @@ COPY . .
 
 RUN bun run build
 
-EXPOSE 4321
+EXPOSE 3000
 
-CMD ["bun", "run", "preview"]
+# Use bun dev for local development, bun run build/preview for production
+CMD ["bun", "dev"]

@@ -1,6 +1,22 @@
 version: "3.9"
 
 services:
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: astro_app
+    command: bun dev
+    volumes:
+      - ./app:/app
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://astro:astro_pass@db:5432/astro_db
+      ADMIN_PASSWORD: 1234
+    depends_on:
+      - db
+
   db:
     image: postgres:16
     container_name: astro_db
@@ -11,8 +27,6 @@ services:
     volumes:
       - ./db/init:/docker-entrypoint-initdb.d
       - db_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
 
 volumes:
   db_data:
