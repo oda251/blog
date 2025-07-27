@@ -1,7 +1,8 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Greeting from '../../components/Greeting.astro';
-const title = 'Home';
+import { t } from '@src/i18n';
+const title = t('home');
 const locale = Astro.currentLocale ? Astro.currentLocale : 'en';
 ---
 
@@ -10,9 +11,9 @@ const locale = Astro.currentLocale ? Astro.currentLocale : 'en';
     <Greeting />
     <br />
     <p id="message" class="text-lg">
-      私のプロフィールは<a href=`/${locale}/aboutme` class="text-blue-300"
-        >こちら</a
-      >です。
+      {t('profile_message')}
+      <a href={`/${locale}/aboutme`} class="text-blue-300">{t('profile_link')}</a>
+      {t('profile_suffix')}
     </p>
   </div>
 </BaseLayout>

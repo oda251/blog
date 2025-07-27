@@ -29,6 +29,12 @@ export default {
           '50%': { borderColor: 'transparent' },
         },
       },
+      colors: {
+        'background': '#101116',
+        'scaffold': '#1A222E',
+        'button-general': '#572488',
+        'button-highlight': '#A855F7',
+      }
     },
   },
   plugins: [

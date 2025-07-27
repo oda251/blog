@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import TweetEditor from './TweetEditor';
 import TweetList from './TweetList';
@@ -7,6 +7,7 @@ import type { AppDispatch } from './store';
 import TagFilterSelector from './TagFilterSelector';
 import { setTweets } from './slice/tweets';
 import { setTags } from './slice/tags';
+import CreateTweetButton from './CreateTweetButton';
 
 export interface TweetAppProps {
   tweets: TweetWithTags[];
@@ -42,10 +43,10 @@ const TweetApp: React.FC<TweetAppProps> = ({ tweets, tagMap }) => {
   }, [dispatch, tweets, tagMap]);
 
   return (
-    <div className="max-w-xl w-full px-6 mx-auto flex flex-col items-center">
+    <div className="max-w-xl w-full px-6 mx-auto flex flex-col items-center relative">
       <TagFilterSelector />
       <TweetList className="border-t border-slate-500" />
-      <TweetEditor className="mt-1" />
+      <CreateTweetButton />
     </div>
   );
 };

@@ -20,25 +20,28 @@ const TweetList: React.FC<TweetListProps> = ({ className }) => {
   const isLoading = useRef<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
 
-  const handleItemsRendered = useCallback(async ({ visibleStopIndex }) => {
-    if (
-      !isLoading.current &&
-      hasMoreOldTweets.current &&
-      tweets.length % pageSize === 0 &&
-      visibleStopIndex === tweets.length - 1
-    ) {
-      isLoading.current = true;
-      const updated = await dispatch(
-        loadOlderTweetsAction(tweets[tweets.length - 1].id)
-      );
-      if (loadOlderTweetsAction.fulfilled.match(updated)) {
-        hasMoreOldTweets.current = updated.payload;
-      } else if (loadOlderTweetsAction.rejected.match(updated)) {
-        hasMoreOldTweets.current = false;
+  const handleItemsRendered = useCallback(
+    async ({ visibleStopIndex }) => {
+      if (
+        !isLoading.current &&
+        hasMoreOldTweets.current &&
+        tweets.length % pageSize === 0 &&
+        visibleStopIndex === tweets.length - 1
+      ) {
+        isLoading.current = true;
+        const updated = await dispatch(
+          loadOlderTweetsAction(tweets[tweets.length - 1].id)
+        );
+        if (loadOlderTweetsAction.fulfilled.match(updated)) {
+          hasMoreOldTweets.current = updated.payload;
+        } else if (loadOlderTweetsAction.rejected.match(updated)) {
+          hasMoreOldTweets.current = false;
+        }
+        isLoading.current = false;
       }
-      isLoading.current = false;
-    }
-  }, []);
+    },
+    [dispatch, tweets]
+  );
 
   const getItemSize = (index: number) => {
     return sizeMap.current.get(index) || 100;

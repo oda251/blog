@@ -2,7 +2,11 @@
   "extends": "./node_modules/astro/tsconfigs/base",
   "compilerOptions": {
     "types": [],
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@src/*": ["src/*"]
+    }
   },
-  "include": ["src/types/*.d.ts"]
+  "include": ["src/**/*"]
 }

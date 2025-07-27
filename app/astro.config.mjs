@@ -10,6 +10,9 @@ export default defineConfig({
   output: 'server',
   adapter: vercel(),
   integrations: [tailwind(), react()],
+  alias: {
+    '@src': './src',
+  },
   i18n: {
     locales: ['en', 'jp'],
     defaultLocale: 'jp',

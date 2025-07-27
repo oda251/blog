@@ -1,14 +1,18 @@
 all:
-	@docker-compose up -d
+	@docker compose up -d
+	@docker compose logs -f
 
 build:
-	@docker-compose up -d --build
+	@docker compose up -d --build
 
 stop:
-	@docker-compose down
+	@docker compose down
+
+rm-volumes:
+	@docker compose down -v
 
 logs:
-	@docker-compose logs -f
+	@docker compose logs -f
 
 re: stop all
 

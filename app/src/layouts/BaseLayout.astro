@@ -2,6 +2,9 @@
 import Layout from './Layout.astro';
 import Header from '../components/navigation/Header.astro';
 import Footer from '../components/navigation/Footer.astro';
+import { I18nextProvider } from 'react-i18next';
+import i18n from '../i18n';
+
 interface Props {
   title: string;
 }
@@ -9,7 +12,9 @@ const { title } = Astro.props;
 ---
 
 <Layout title={title}>
-  <Header />
-  <slot />
-  <Footer />
+  <I18nextProvider i18n={i18n}>
+    <Header />
+    <slot />
+    <Footer />
+  </I18nextProvider>
 </Layout>

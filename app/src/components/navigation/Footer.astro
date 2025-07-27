@@ -2,7 +2,7 @@
 import ProfileCard from '../information/ProfileCard.astro';
 ---
 
-<footer class="relative w-full pt-2 h-full">
+<footer class="relative w-full pt-2 h-full z-[100]">
   <div class="waves-container w-full" style="height: 60px;">
     <svg
       class="waves"
@@ -23,8 +23,9 @@ import ProfileCard from '../information/ProfileCard.astro';
       </g>
     </svg>
   </div>
-  <div class="z-10 bg-gray-800/60 w-full h-full">
-    <ProfileCard class="p-4" />
+  <div class="z-10 w-full h-full relative">
+    <div class="absolute inset-x-0 h-36 bg-gradient-to-b from-[#1a4b74] to-[#13151a]"></div>
+    <ProfileCard class="absolute px-4 py-3" />
   </div>
 </footer>
 

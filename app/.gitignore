@@ -3,3 +3,4 @@
 !.env.example
 !.yarnrc.yml
 node_modules
+/generated/prisma

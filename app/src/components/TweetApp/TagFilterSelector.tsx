@@ -2,10 +2,12 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from './store';
 import { applyTagFilterAction } from './thunk/setTagFilter';
+import { useTranslation } from 'react-i18next';
 
 interface TagSelectorProps {}
 
 const TagFilterSelector: React.FC<TagSelectorProps> = () => {
+  const { t } = useTranslation();
   const tagMap = useSelector((state: RootState) => state.tag.tags);
   const selected = useSelector((state: RootState) => state.tweet.tagFilter);
   const dispatch = useDispatch<AppDispatch>();
@@ -71,7 +73,7 @@ const TagFilterSelector: React.FC<TagSelectorProps> = () => {
             alignItems: 'center',
             display: 'flex',
           }}
-          aria-label="More tags"
+          aria-label={t('more_tags')}
         >
         </span>
       )}
@@ -86,6 +88,7 @@ const TagFilterSearch: React.FC<{
 }> = ({ search, setSearch }) => {
   const [expanded, setExpanded] = React.useState(false);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const { t } = useTranslation();
 
   // Collapse input on blur if empty
   const handleBlur = () => {
@@ -113,7 +116,7 @@ const TagFilterSearch: React.FC<{
         onChange={(e) => setSearch(e.target.value)}
         onFocus={handleExpand}
         onBlur={handleBlur}
-        placeholder="search"
+        placeholder={t('search')}
         className={`text-sm border rounded-md pl-2 pr-7 bg-white transition-all duration-200 h-8
           ${expanded ? 'opacity-100 w-full' : 'opacity-0 w-0 p-0 border-transparent'}
         `}
@@ -130,7 +133,7 @@ const TagFilterSearch: React.FC<{
       />
       <button
         type="button"
-        aria-label="Search tags"
+        aria-label={t('search_tags')}
         className="absolute right-2 text-slate-400 text-md focus:outline-none"
         tabIndex={expanded ? -1 : 0}
         onClick={handleExpand}

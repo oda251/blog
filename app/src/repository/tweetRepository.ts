@@ -1,4 +1,6 @@
 import type { Tag, TagMap, TweetWithTags } from '../types/Tweet';
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
 import pg from 'pg';
 import moment from 'moment-timezone';
 import { validateTweet } from '../entities/validate';
@@ -32,27 +34,22 @@ class TweetRepository {
   }
 
   async fetchTweetById(tweetId: string): Promise<TweetWithTags> {
-    const query = `
-			SELECT t.*, array_agg(tt.tag_id) as tag_id_list
-			FROM tweets t
-			LEFT JOIN tweets_tags tt ON t.id = tt.tweet_id
-			WHERE t.id = $1
-			GROUP BY t.id;
-		`;
-    const result: pg.QueryResult<TweetWithTags> = await this.client.query(
-      query,
-      [tweetId]
-    );
-    const row = result.rows[0];
-    if (!row) {
+    // Prisma ORMでN+1回避
+    const tweet = await prisma.tweet.findUnique({
+      where: { id: Number(tweetId) },
+      include: {
+        tags: true,
+      },
+    });
+    if (!tweet) {
       throw new Error('Tweet not found');
     }
     return {
-      ...row,
-      created_at: moment(row.created_at)
+      ...tweet,
+      created_at: moment(tweet.created_at)
         .tz('Asia/Tokyo')
         .format('YYYY-MM-DD HH:mm:ss'),
-      tag_id_list: row.tag_id_list[0] ? row.tag_id_list : [],
+      tag_id_list: tweet.tags.map((tag) => tag.id),
     };
   }
 
@@ -120,7 +117,7 @@ class TweetRepository {
       query,
       params
     );
-    const tweets = result.rows.map((row: any) => ({
+    const tweets = result.rows.map((row) => ({
       ...row,
       created_at: moment(row.created_at)
         .tz('Asia/Tokyo')
@@ -184,7 +181,7 @@ class TweetRepository {
       query,
       params
     );
-    return result.rows.map((row: any) => ({
+    return result.rows.map((row) => ({
       ...row,
       created_at: moment(row.created_at)
         .tz('Asia/Tokyo')

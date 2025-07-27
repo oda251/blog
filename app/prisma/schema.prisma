@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
+}
+
+model tags {
+  id          BigInt        @id @default(autoincrement())
+  name        String        @unique @db.String(128)
+  tweets_tags tweets_tags[]
+}
+
+model tweets {
+  id          BigInt        @id @default(autoincrement())
+  content     String        @db.String(1024)
+  article     String?       @db.String(16384)
+  author      String?       @db.String(128)
+  ip_address  String?       @db.String(32)
+  created_at  DateTime?     @default(now()) @db.Timestamptz(6)
+  tweets_tags tweets_tags[]
+  vector      vector[]
+}
+
+model tweets_tags {
+  tweet_id BigInt
+  tag_id   BigInt
+  tags     tags   @relation(fields: [tag_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tweets   tweets @relation(fields: [tweet_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([tweet_id, tag_id])
+}
+
+model vector {
+  id           BigInt @id @default(autoincrement())
+  source_id    BigInt
+  source_table String @db.String(128)
+  embedding    String
+  tweets       tweets @relation(fields: [source_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+// --- Existing tweet/tag/tweet_vectors models ---
+model Tweet {
+  id         Int      @id @default(sequence())
+  content    String
+  article    String?
+  author     String?
+  ip_address String?
+  created_at DateTime @default(now())
+  tags       Tag[]
+  tweet_vectors TweetVector[]
+}
+
+model Tag {
+  id    Int     @id @default(sequence())
+  name  String  @unique
+  tweets Tweet[]
+  articles Article[]
+}
+
+model TweetVector {
+  id        Int    @id @default(sequence())
+  tweet_id  Int
+  embedding String
+  tweet     Tweet? @relation(fields: [tweet_id], references: [id])
+}
+
+// --- Article model ---
+model Article {
+  id        Int      @id @default(sequence())
+  title     String
+  body      String
+  author    String?
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  tags      Tag[]
+}
+
+// --- Product/devlangs/frameworks/infras models ---
+enum DevLangCode {
+  JS
+  TS
+  GAS
+}
+
+enum FrameworkCode {
+  REACT
+  ASTRO
+  HONO
+  TAILWIND
+}
+
+model DevLangRelation {
+  id      Int    @id @default(sequence())
+  code    DevLangCode
+  Product Product[]
+}
+
+model FrameworkRelation {
+  id      Int    @id @default(sequence())
+  code    FrameworkCode
+  Product Product[]
+}
+
+model Infra {
+  id      Int    @id @default(sequence())
+  name    String @unique
+  Product Product[]
+}
+
+model Product {
+  id        Int     @id @default(sequence())
+  title_en  String
+  title_ja  String
+  thumbnail String?
+  body      Json?
+  github    String?
+  href      String?
+  langs     DevLangRelation[]
+  frameworks FrameworkRelation[]
+  infras    Infra[]
+}
