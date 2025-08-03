@@ -31,7 +31,6 @@ services:
       - db:/cockroachdb/cockroach-data
     ports:
       - "26257:26257"
-      - "8080:8080"
     networks:
       - blog
     command: >

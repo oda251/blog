@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { deleteTweet } from '../repository/deleteTweet';
 import { removeTweet } from '../slice/tweets';
-import type { Result } from '../../../types/Result';
+import type { Result } from '../../../entities/types/Result';
 
 export interface DeleteTweetPayload {
   tweetId: string;

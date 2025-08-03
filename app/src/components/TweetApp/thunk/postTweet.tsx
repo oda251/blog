@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import type { TweetWithTags } from '../../../types/Tweet';
+import type { TweetWithTags } from '../../../entities/types/Tweet';
 import type { TweetSliceState } from '../slice/tweets';
 import { postTweet } from '../repository/postTweet';
 import { applyTagFilterAction } from './setTagFilter';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { validateTweet } from '../../entities/validate';
-import type { TweetWithTags } from '../../types/Tweet';
+import type { TweetWithTags } from '../../entities/types/Tweet';
 import TagSelector from './TagSelector';
 import { useDispatch } from 'react-redux';
 import type { AppDispatch } from './store';

@@ -1,5 +1,5 @@
 import React from 'react';
-import type { TweetWithTags } from '../../types/Tweet';
+import type { TweetWithTags } from '../../entities/types/Tweet';
 import Linkify from 'linkify-react';
 import { useSelector } from 'react-redux';
 import type { RootState } from './store';

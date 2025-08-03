@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import TweetEditor from './TweetEditor';
 import TweetList from './TweetList';
-import type { TagMap, TweetWithTags } from '../../types/Tweet';
+import type { TagMap, TweetWithTags } from '../../entities/types/Tweet';
 import type { AppDispatch } from './store';
 import TagFilterSelector from './TagFilterSelector';
 import { setTweets } from './slice/tweets';
@@ -22,7 +22,7 @@ const TweetApp: React.FC<TweetAppProps> = ({ tweets, tagMap }) => {
     dispatch(setTweets(tweets));
     // Fetch tags from API
     fetch('/api/tags')
-      .then(res => res.ok ? res.json() : {})
+      .then((res) => (res.ok ? res.json() : {}))
       .then((data) => {
         // Ensure data is a valid TagMap: { [id: string]: string }
         if (data && typeof data === 'object' && !Array.isArray(data)) {

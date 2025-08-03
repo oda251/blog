@@ -1,18 +1,21 @@
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
-import tailwind from '@astrojs/tailwind';
 import vercel from '@astrojs/vercel/serverless';
 import dotenv from 'dotenv';
+
+import tailwindcss from '@tailwindcss/vite';
 
 dotenv.config();
 
 export default defineConfig({
   output: 'server',
   adapter: vercel(),
-  integrations: [tailwind(), react()],
+  integrations: [react()],
+
   alias: {
     '@src': './src',
   },
+
   i18n: {
     locales: ['en', 'jp'],
     defaultLocale: 'jp',
@@ -21,6 +24,11 @@ export default defineConfig({
       exclude: ['/api/**'],
     },
   },
+
   imageService: 'imgix',
   platform: 'node',
+
+  vite: {
+    plugins: [tailwindcss()],
+  },
 });

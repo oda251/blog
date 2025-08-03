@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 import Linkify from 'linkify-react';
-import type { TweetWithTags } from '../../types/Tweet';
+import type { TweetWithTags } from '../../entities/types/Tweet';
 import DeleteTweetButton from './DeleteTweetBottun';
 import type { RootState } from './store';
 import { useSelector } from 'react-redux';

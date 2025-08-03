@@ -1,6 +1,6 @@
-import type { TweetWithTags } from '../types/Tweet';
+import type { Tweets } from '@prisma/client';
 
-export function validateTweet(tweet: TweetWithTags | null) {
+export function validateTweet(tweet: Tweets | null) {
   if (!tweet) {
     throw new Error('tweet is null');
   }

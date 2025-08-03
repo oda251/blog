@@ -1,4 +1,4 @@
-import type { TweetWithTags } from '../../../types/Tweet';
+import type { TweetWithTags } from '../../../entities/types/Tweet';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 import {

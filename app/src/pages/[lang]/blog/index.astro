@@ -1,0 +1,17 @@
+---
+import BaseLayout from '@src/components/layouts/BaseLayout.astro';
+import TweetApp from '@src/components/TweetApp/index';
+import TweetRepository from '@src/repositories/tweetRepository';
+import { getLangFromUrl, useTranslations } from '@src/app/i18n';
+const t = useTranslations( getLangFromUrl(Astro.url) );
+// TODO: Use i18n for title
+const title = 'a';
+
+const tweetRepository = new TweetRepository();
+const initTweets = await tweetRepository.fetchNewTweets();
+const tagMap = await tweetRepository.fetchTags();
+---
+
+<BaseLayout title={title}>
+  <TweetApp client:only="react" tweets={initTweets} tagMap={tagMap} />
+</BaseLayout>

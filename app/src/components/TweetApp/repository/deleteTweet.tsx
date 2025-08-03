@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Result } from '../../../types/Result';
+import type { Result } from '../../../entities/types/Result';
 
 export async function deleteTweet(
   tweetId: string,
